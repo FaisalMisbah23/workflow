@@ -16,7 +16,7 @@ A React Native Expo mobile application for task and team management, built with 
 - **Navigation**: Expo Router (file-based routing)
 - **Styling**: Tailwind CSS via NativeWind
 - **State Management**: React Context API (UserContext)
-- **Backend**: Supabase (Authenication, Database, Edge Functions, Storage)
+- **Backend**: Supabase (Authentication, Database, Edge Functions, Storage)
 - **Language**: TypeScript (strict mode)
 
 ## Project Structure
