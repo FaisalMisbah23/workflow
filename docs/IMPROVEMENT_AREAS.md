@@ -16,7 +16,7 @@
 
 ## Specific Code Issues
 
-- Fix `Paswword`, `Orgnaization`, and `Achievments` UI text.
+- Fix `Password`, `Organization`, and `Achievements` UI text.
 - Change login failure message to `Invalid email or password`.
 - Align task assignment fields across `createtask.tsx`, `task.tsx`, `DashboardData.tsx`, and Supabase schema.
 - Align notification read field as either `read` or `is_read` across schema, code, and docs.

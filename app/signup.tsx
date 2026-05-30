@@ -87,7 +87,7 @@ const signup = () => {
           />
         </View> */}
         <View className="gap-3 mb-4">
-          <Text className="text-xl">Paswword</Text>
+          <Text className="text-xl">Password</Text>
           <TextInput
             className="bg-surface border border-secondary rounded-lg shadow-sm p-4 pr-12"
             secureTextEntry={!showPassword}
