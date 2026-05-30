@@ -4,7 +4,7 @@ import { supabase } from "@/lib/supabase";
 import Ionicons from "@expo/vector-icons/build/Ionicons";
 import * as ImagePicker from "expo-image-picker";
 import { useRouter } from "expo-router";
-import React, { useContext, useState } from "react";
+import { useContext, useState } from "react";
 import {
   Alert,
   Image,
@@ -13,8 +13,9 @@ import {
   ScrollView,
   Text,
   TextInput,
+  ToastAndroid,
   TouchableOpacity,
-  View
+  View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 const Profile = () => {
@@ -105,27 +106,23 @@ const Profile = () => {
   };
 
   const handleLogout = async () => {
-    Alert.alert(
-      "Logout",
-      "Are you sure you want to logout?",
-      [
-        { text: "Cancel", style: "cancel" },
-        {
-          text: "Logout",
-          style: "destructive",
-          onPress: async () => {
-            await supabase.auth.signOut();
-            // Navigate to sign-in page
-            if (Platform.OS === 'web') {
-              window.location.href = '/signin';
-            } else {
-              // For mobile, you would use router.push
-              router.push('/signin');
-            }
-          },
+    Alert.alert("Logout", "Are you sure you want to logout?", [
+      { text: "Cancel", style: "cancel" },
+      {
+        text: "Logout",
+        style: "destructive",
+        onPress: async () => {
+          await supabase.auth.signOut();
+          // Navigate to sign-in page
+          if (Platform.OS === "web") {
+            window.location.href = "/signin";
+          } else {
+            // For mobile, you would use router.push
+            router.push("/signin");
+          }
         },
-      ]
-    );
+      },
+    ]);
   };
 
   const updateAvatar = async (userId: string, avatarurl: string) => {
@@ -142,7 +139,7 @@ const Profile = () => {
   };
   const pickImage = async () => {
     if (!isLoggedIn || !user) {
-      if (Platform.OS === 'android') {
+      if (Platform.OS === "android") {
         ToastAndroid.show("Please login first", ToastAndroid.SHORT);
       } else {
         Alert.alert("Error", "Please login first");
@@ -170,12 +167,15 @@ const Profile = () => {
 
     if (!result.canceled) {
       const asset = result.assets[0];
-      
+
       // Validate image format
-      const validFormats = ['jpg', 'jpeg', 'png', 'webp'];
-      const fileExtension = asset.uri.split('.').pop()?.toLowerCase();
+      const validFormats = ["jpg", "jpeg", "png", "webp"];
+      const fileExtension = asset.uri.split(".").pop()?.toLowerCase();
       if (!fileExtension || !validFormats.includes(fileExtension)) {
-        Alert.alert("Error", "Invalid image format. Please use JPG, PNG, or WEBP.");
+        Alert.alert(
+          "Error",
+          "Invalid image format. Please use JPG, PNG, or WEBP.",
+        );
         return;
       }
 
@@ -192,7 +192,7 @@ const Profile = () => {
       const avatarurl = await uploadImage(asset.uri, user.id);
       if (avatarurl) {
         await updateAvatar(user.id, avatarurl);
-        if (Platform.OS === 'android') {
+        if (Platform.OS === "android") {
           ToastAndroid.show("Profile picture updated", ToastAndroid.SHORT);
         } else {
           Alert.alert("Success", "Profile picture updated");
@@ -212,11 +212,14 @@ const Profile = () => {
     }
     // Username validation - alphanumeric and underscores only
     if (!/^[a-zA-Z0-9_]+$/.test(editUsername.trim())) {
-      Alert.alert("Error", "Username can only contain letters, numbers, and underscores");
+      Alert.alert(
+        "Error",
+        "Username can only contain letters, numbers, and underscores",
+      );
       return;
     }
     setSaving(true);
-    
+
     // Check for username conflict
     const { data: existingUser } = await supabase
       .from("profiles")
@@ -224,7 +227,7 @@ const Profile = () => {
       .eq("username", editUsername.trim())
       .neq("id", user?.user?.id)
       .single();
-    
+
     if (existingUser) {
       Alert.alert("Error", "Username already taken");
       setSaving(false);
@@ -233,24 +236,24 @@ const Profile = () => {
 
     const { error } = await supabase
       .from("profiles")
-      .update({ 
+      .update({
         fullname: editFullname.trim(),
         username: editUsername.trim(),
-        bio: editBio.trim()
+        bio: editBio.trim(),
       })
       .eq("id", user?.user?.id);
 
     if (error) {
       Alert.alert("Error", error.message);
     } else {
-      setProfile({ 
-        ...profile, 
+      setProfile({
+        ...profile,
         fullname: editFullname.trim(),
         username: editUsername.trim(),
-        bio: editBio.trim()
+        bio: editBio.trim(),
       });
       // ToastAndroid is not available on web
-      if (Platform.OS === 'android') {
+      if (Platform.OS === "android") {
         ToastAndroid.show("Profile updated", ToastAndroid.SHORT);
       } else {
         Alert.alert("Success", "Profile updated");
@@ -260,9 +263,6 @@ const Profile = () => {
     setSaving(false);
   };
 
-  console.log("profile", profile);
-  console.log("ORG", Org);
-  console.log("user", user);
   return (
     <SafeAreaView className="flex-1 bg-gray-50">
       <ScrollView className="flex-1">
@@ -271,7 +271,7 @@ const Profile = () => {
           <View className="bg-white rounded-2xl shadow-sm overflow-hidden mb-6">
             {/* Banner */}
             <View className="bg-gradient-to-r from-primary to-primary/80 h-32" />
-            
+
             {/* Profile Info */}
             <View className="px-5 pb-5 -mt-16">
               <View className="flex-row items-end">
@@ -286,13 +286,19 @@ const Profile = () => {
                     <View className="bg-gradient-to-br from-gray-200 to-gray-300 w-24 h-24 rounded-full border-4 border-white shadow-md items-center justify-center">
                       <Text className="text-primary text-2xl font-bold">
                         {profile?.fullname
-                          ? profile.fullname.trim().split(/\s+/).slice(0, 2).map((p) => p[0]).join("").toUpperCase()
+                          ? profile.fullname
+                              .trim()
+                              .split(/\s+/)
+                              .slice(0, 2)
+                              .map((p) => p[0])
+                              .join("")
+                              .toUpperCase()
                           : user?.user?.email?.slice(0, 2).toUpperCase()}
                       </Text>
                     </View>
                   )}
                   {/* Camera Button */}
-                  <TouchableOpacity 
+                  <TouchableOpacity
                     testID="camera-icon"
                     onPress={pickImage}
                     className="absolute bottom-0 right-0 bg-primary rounded-full p-2 shadow-md"
@@ -300,7 +306,7 @@ const Profile = () => {
                     <Ionicons name="camera" size={16} color="white" />
                   </TouchableOpacity>
                 </View>
-                
+
                 {/* User Info */}
                 <View className="ml-4 flex-1 mb-2">
                   {isEditing ? (
@@ -331,7 +337,9 @@ const Profile = () => {
                           disabled={saving}
                           className="bg-primary flex-1 py-2.5 rounded-lg"
                         >
-                          <Text className="text-white text-center font-medium">{saving ? "Saving..." : "Save"}</Text>
+                          <Text className="text-white text-center font-medium">
+                            {saving ? "Saving..." : "Save"}
+                          </Text>
                         </TouchableOpacity>
                         <TouchableOpacity
                           onPress={() => {
@@ -342,7 +350,9 @@ const Profile = () => {
                           }}
                           className="bg-gray-200 flex-1 py-2.5 rounded-lg"
                         >
-                          <Text className="text-gray-700 text-center font-medium">Cancel</Text>
+                          <Text className="text-gray-700 text-center font-medium">
+                            Cancel
+                          </Text>
                         </TouchableOpacity>
                       </View>
                     </View>
@@ -352,16 +362,20 @@ const Profile = () => {
                         {profile?.fullname}
                       </Text>
                       {profile?.username ? (
-                        <Text className="text-gray-500 text-sm">@{profile.username}</Text>
+                        <Text className="text-gray-500 text-sm">
+                          @{profile.username}
+                        </Text>
                       ) : null}
                       {profile?.bio && (
-                        <Text className="text-gray-600 text-sm mt-1 line-clamp-2">{profile?.bio}</Text>
+                        <Text className="text-gray-600 text-sm mt-1 line-clamp-2">
+                          {profile?.bio}
+                        </Text>
                       )}
                     </View>
                   )}
                 </View>
               </View>
-              
+
               {/* Action Buttons (View Mode Only) */}
               {!isEditing && (
                 <View className="mt-4 flex-row gap-2">
@@ -369,44 +383,60 @@ const Profile = () => {
                     onPress={() => setIsEditing(true)}
                     className="flex-1 bg-primary py-2.5 rounded-lg"
                   >
-                    <Text className="text-white text-center font-medium text-sm">Edit Profile</Text>
+                    <Text className="text-white text-center font-medium text-sm">
+                      Edit Profile
+                    </Text>
                   </TouchableOpacity>
                   <TouchableOpacity
                     onPress={() => setShowChangePassword(true)}
                     className="flex-1 bg-gray-200 py-2.5 rounded-lg"
                   >
-                    <Text className="text-gray-700 text-center font-medium text-sm">Change Password</Text>
+                    <Text className="text-gray-700 text-center font-medium text-sm">
+                      Change Password
+                    </Text>
                   </TouchableOpacity>
                   <TouchableOpacity
                     onPress={handleLogout}
                     className="bg-red-50 py-2.5 px-4 rounded-lg"
                   >
-                    <Ionicons name="log-out-outline" size={20} color="#EF4444" />
+                    <Ionicons
+                      name="log-out-outline"
+                      size={20}
+                      color="#EF4444"
+                    />
                   </TouchableOpacity>
                 </View>
               )}
             </View>
           </View>
-          
+
           {/* Stats Card */}
           <View className="bg-white rounded-2xl shadow-sm p-5 mb-6">
-            <Text className="text-lg font-semibold text-gray-900 mb-4">Profile Details</Text>
+            <Text className="text-lg font-semibold text-gray-900 mb-4">
+              Profile Details
+            </Text>
             <View className="space-y-3">
               <View className="flex-row justify-between items-center py-2 border-b border-gray-100">
                 <Text className="text-gray-500 text-sm">Role</Text>
-                <Text className="text-gray-900 font-medium capitalize">{profile?.role ?? 'Member'}</Text>
+                <Text className="text-gray-900 font-medium capitalize">
+                  {profile?.role ?? "Member"}
+                </Text>
               </View>
               <View className="flex-row justify-between items-center py-2 border-b border-gray-100">
                 <Text className="text-gray-500 text-sm">Organization</Text>
-                <Text className="text-gray-900 font-medium">{Org?.[0]?.name || 'None'}</Text>
+                <Text className="text-gray-900 font-medium">
+                  {Org[0]?.name || "None"}
+                </Text>
               </View>
               <View className="flex-row justify-between items-center py-2">
                 <Text className="text-gray-500 text-sm">Joined</Text>
-                <Text className="text-gray-900 font-medium">{user?.user?.created_at?.slice(0, 10)}</Text>
+                <Text className="text-gray-900 font-medium">
+                  {user?.user?.created_at?.slice(0, 10)}
+                </Text>
               </View>
             </View>
           </View>
-          
+
           {/* Achievements removed */}
 
           {/* Settings */}
@@ -424,14 +454,18 @@ const Profile = () => {
         <View className="flex-1 bg-black/50 justify-end">
           <View className="bg-white rounded-t-3xl p-6">
             <View className="flex-row justify-between items-center mb-6">
-              <Text className="text-xl font-bold text-gray-900">Change Password</Text>
+              <Text className="text-xl font-bold text-gray-900">
+                Change Password
+              </Text>
               <TouchableOpacity onPress={() => setShowChangePassword(false)}>
                 <Ionicons name="close" size={24} color="#6B7280" />
               </TouchableOpacity>
             </View>
             <View className="space-y-4">
               <View>
-                <Text className="text-sm font-medium text-gray-700 mb-2">Current Password</Text>
+                <Text className="text-sm font-medium text-gray-700 mb-2">
+                  Current Password
+                </Text>
                 <TextInput
                   value={currentPassword}
                   onChangeText={setCurrentPassword}
@@ -441,7 +475,9 @@ const Profile = () => {
                 />
               </View>
               <View>
-                <Text className="text-sm font-medium text-gray-700 mb-2">New Password</Text>
+                <Text className="text-sm font-medium text-gray-700 mb-2">
+                  New Password
+                </Text>
                 <TextInput
                   value={newPassword}
                   onChangeText={setNewPassword}
@@ -450,11 +486,14 @@ const Profile = () => {
                   className="bg-gray-100 border border-gray-200 rounded-xl px-4 py-3 text-base"
                 />
                 <Text className="text-xs text-gray-500 mt-2">
-                  Must be at least 8 characters with uppercase, lowercase, and number
+                  Must be at least 8 characters with uppercase, lowercase, and
+                  number
                 </Text>
               </View>
               <View>
-                <Text className="text-sm font-medium text-gray-700 mb-2">Confirm Password</Text>
+                <Text className="text-sm font-medium text-gray-700 mb-2">
+                  Confirm Password
+                </Text>
                 <TextInput
                   value={confirmPassword}
                   onChangeText={setConfirmPassword}
