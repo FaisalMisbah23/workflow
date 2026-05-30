@@ -1,0 +1,56 @@
+erDiagram
+    organizations ||--o{ profiles : "contains"
+    profiles ||--o{ tasks : "creates"
+    profiles ||--o{ tasks : "assigned to"
+    profiles ||--o{ notifications : "receives"
+    tasks ||--o{ notifications : "triggers"
+    profiles }|--|| roles : "has"
+    
+    organizations {
+        uuid id PK
+        string name
+        string address
+        uuid created_by FK
+        timestamp created_at
+    }
+    
+    profiles {
+        uuid id PK
+        string email
+        string full_name
+        string username
+        string role
+        uuid org_id FK
+        timestamp created_at
+        timestamp updated_at
+    }
+    
+    tasks {
+        uuid id PK
+        string title
+        string description
+        string priority
+        string status
+        timestamp deadline
+        uuid created_by FK
+        uuid assigned_to FK
+        uuid org_id FK
+        array comments
+        timestamp created_at
+        timestamp updated_at
+    }
+    
+    notifications {
+        uuid id PK
+        uuid user_id FK
+        uuid task_id FK
+        string type
+        string message
+        boolean is_read
+        timestamp created_at
+    }
+    
+    roles {
+        uuid id PK
+        string role_name
+    }

@@ -1,0 +1,32 @@
+sequenceDiagram
+    participant Manager as Manager
+    participant UI as React Native UI
+    participant Supabase as Supabase SDK
+    participant DB as PostgreSQL
+    participant RT as Realtime Service
+    participant Member as Member
+    
+    Manager->>UI: Submit Task Details
+    UI->>Supabase: insert(tasks)
+    Supabase->>DB: Insert Task Row
+    DB-->>RT: Database Change Event
+    RT->>Member: Real-time Update
+    Member->>UI: View Task in Dashboard
+    
+    Member->>UI: Update Status to In Progress
+    UI->>Supabase: update(tasks, status)
+    Supabase->>DB: Update Task Row
+    DB-->>RT: Database Change Event
+    RT->>Manager: Real-time Update
+    Manager->>UI: View Updated Task
+    
+    Note over RT: Scheduled Deadline Check (via Supabase Functions)
+    RT->>DB: Query Tasks Near Deadline
+    RT->>Member: Deadline Warning Notification
+    
+    Member->>UI: Update Status to Completed
+    UI->>Supabase: update(tasks, status)
+    Supabase->>DB: Update Task Row
+    DB-->>RT: Database Change Event
+    RT->>Manager: Completion Notification
+    Manager->>UI: View Completed Task

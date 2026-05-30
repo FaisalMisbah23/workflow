@@ -1,0 +1,35 @@
+graph TD
+    App[React Native Expo App]
+    
+    subgraph "Screens"
+        Login[Login Screen]
+        Signup[Signup Screen]
+        CreateOrg[Create Organization]
+        CreateTask[Create Task]
+        Notifications[Notifications Screen]
+        Tabs[Tab Navigation]
+    end
+    
+    subgraph "Context Providers"
+        UserContext[User Context]
+        NotifContext[Notification Context]
+    end
+    
+    subgraph "Components"
+        KPICards[KPI Cards]
+        TaskList[Task List]
+        TaskCard[Task Card]
+        NotifItem[Notification Item]
+    end
+    
+    App --> Screens
+    App --> Context Providers
+    Login --> UserContext
+    Signup --> UserContext
+    CreateOrg --> UserContext
+    CreateTask --> UserContext
+    Notifications --> NotifContext
+    Tabs --> KPICards
+    Tabs --> TaskList
+    TaskList --> TaskCard
+    Notifications --> NotifItem

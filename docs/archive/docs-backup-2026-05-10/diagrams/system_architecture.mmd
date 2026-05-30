@@ -1,0 +1,33 @@
+graph TB
+    subgraph "Mobile Client Layer"
+        RN[React Native App]
+        Expo[Expo Router]
+        TS[TypeScript]
+        TW[Tailwind CSS]
+        NW[NativeWind]
+    end
+    
+    subgraph "Supabase Backend Layer"
+        PG[PostgreSQL Database]
+        AUTH[Auth Service]
+        RT[Realtime Subscriptions]
+        ST[Storage Service]
+        RLS[Row Level Security]
+    end
+    
+    RN -->|Supabase SDK| PG
+    Expo -->|Supabase SDK| AUTH
+    TS -->|Supabase SDK| RT
+    TW -->|Supabase SDK| ST
+    NW -->|Supabase SDK| RLS
+    
+    PG -.->|WebSocket| RT
+    AUTH -.->|JWT Tokens, Sessions, RLS| PG
+    RT -.->|Channels, Broadcast, Presence| PG
+    ST -.->|Files, Images| PG
+    RLS -.->|Data Access Control| PG
+
+    PG -->|profiles, tasks, orgs| PG
+    AUTH -->|Authentication| PG
+    RT -->|Real-time updates| PG
+    ST -->|File storage| PG
