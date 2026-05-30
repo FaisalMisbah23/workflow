@@ -1,10 +1,12 @@
-import { Text, TouchableOpacity, View } from "react-native";
 import Ionicons from "@expo/vector-icons/build/Ionicons";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
+import { Text, TouchableOpacity, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import "react-native-url-polyfill/auto";
 
 export default function Index() {
   const router = useRouter();
+
   return (
     <SafeAreaView className="flex-1 items-center justify-center">
       <View className="flex-column gap-3 items-center mb-[80px]">

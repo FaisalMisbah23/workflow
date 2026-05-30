@@ -1,9 +1,17 @@
 import { UserContext } from "@/context/UserContext";
 import { supabase } from "@/lib/supabase";
+import DateTimePicker from "@react-native-community/datetimepicker";
 import { Picker } from "@react-native-picker/picker";
 import { useRouter } from "expo-router";
-import React, { useContext, useEffect, useState } from "react";
-import { Alert, Platform, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { useContext, useEffect, useState } from "react";
+import {
+  Alert,
+  Platform,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const showToast = (message: string) => {
@@ -21,7 +29,11 @@ const defaultTeamMembers: any[] = [];
 
 const isPermissionError = (error: any) => {
   const message = error?.message?.toLowerCase?.() || "";
-  return error?.code === "42501" || message.includes("permission") || message.includes("row-level security");
+  return (
+    error?.code === "42501" ||
+    message.includes("permission") ||
+    message.includes("row-level security")
+  );
 };
 
 const CreateTask = () => {
@@ -32,6 +44,8 @@ const CreateTask = () => {
   const [deadline, setDeadline] = useState("");
   const [loading, setLoading] = useState(false);
   const [assignableUsers, setAssignableUsers] = useState([]);
+  const [date, setDate] = useState<Date | null>(null);
+  const [show, setShow] = useState(false);
   const router = useRouter();
   const {
     user,
@@ -92,20 +106,31 @@ const CreateTask = () => {
       }
 
       const selectedAssignee = assignableUsers.find(
-        (item: any) => item.id === assignTo || item.email === assignTo
+        (item: any) => item.id === assignTo || item.email === assignTo,
       ) as any;
 
       const normalizedAssignTo = assignTo?.trim?.() || "";
-      const selectedAssigneeId = selectedAssignee?.id || (normalizedAssignTo && !normalizedAssignTo.includes("@") ? normalizedAssignTo : null);
+      const selectedAssigneeId =
+        selectedAssignee?.id ||
+        (normalizedAssignTo && !normalizedAssignTo.includes("@")
+          ? normalizedAssignTo
+          : null);
       const selectedAssigneeEmail =
-        selectedAssignee?.email || (normalizedAssignTo && normalizedAssignTo.includes("@") ? normalizedAssignTo.toLowerCase() : null);
+        selectedAssignee?.email ||
+        (normalizedAssignTo && normalizedAssignTo.includes("@")
+          ? normalizedAssignTo.toLowerCase()
+          : null);
 
       if (assignTo && !selectedAssignee) {
         showToast("Selected user is no longer available in this organization");
         return;
       }
 
-      if (selectedAssignee?.org_id && profile?.org_id && selectedAssignee.org_id !== profile.org_id) {
+      if (
+        selectedAssignee?.org_id &&
+        profile?.org_id &&
+        selectedAssignee.org_id !== profile.org_id
+      ) {
         showToast("Selected user is no longer part of this organization");
         return;
       }
@@ -123,7 +148,8 @@ const CreateTask = () => {
         duplicateQuery.eq("created_by", currentUser.id);
       }
 
-      const { data: duplicateTasks, error: duplicateError } = await duplicateQuery;
+      const { data: duplicateTasks, error: duplicateError } =
+        await duplicateQuery;
 
       if (duplicateError) {
         if (isPermissionError(duplicateError)) {
@@ -177,9 +203,12 @@ const CreateTask = () => {
           taskId: createdTask.id,
         };
 
-        const { error: notifyError } = await supabase.functions.invoke("send-notification", {
-          body: notificationPayload,
-        });
+        const { error: notifyError } = await supabase.functions.invoke(
+          "send-notification",
+          {
+            body: notificationPayload,
+          },
+        );
 
         if (notifyError) {
           console.log("Notification dispatch error:", notifyError);
@@ -196,6 +225,15 @@ const CreateTask = () => {
     }
   };
 
+  const onChange = (event: any, selectedDate?: Date) => {
+    setShow(Platform.OS === "ios");
+    if (selectedDate) {
+      setDate(selectedDate);
+      setDeadline(selectedDate);
+    }
+  };
+
+  const formattedDate = date ? date.toDateString() : "Select date";
   return (
     <SafeAreaView className="flex-1 bg-white">
       <View className="p-5">
@@ -244,20 +282,20 @@ const CreateTask = () => {
 
         <View className="mt-3">
           <Text className="text-lg text-secondary">
-            Assign To {profile?.role === 'member' && '(Self only)'}
+            Assign To {profile?.role === "member" && "(Self only)"}
           </Text>
           <View className="border border-gray-300 rounded-lg bg-slate-200">
             <Picker
               selectedValue={assignTo}
               onValueChange={(itemValue) => setAssignTo(itemValue)}
-              enabled={profile?.role !== 'member' || assignableUsers.length > 1}
+              enabled={profile?.role !== "member" || assignableUsers.length > 1}
             >
               <Picker.Item label="Select team member" value="" />
               {assignableUsers &&
                 assignableUsers.map((item: any, index: number) => (
                   <Picker.Item
                     key={index}
-                    label={item.fullname || item.email || 'Unknown'}
+                    label={item.fullname || item.email || "Unknown"}
                     value={item.email || item.id}
                   />
                 ))}
@@ -267,12 +305,28 @@ const CreateTask = () => {
 
         <View className="mt-3">
           <Text className="text-lg text-secondary">Deadline (Optional)</Text>
-          <TextInput
-            className="bg-slate-200 border border-black rounded-lg p-4 py-3"
-            placeholder="YYYY-MM-DD"
-            value={deadline}
-            onChangeText={setDeadline}
-          />
+          <TouchableOpacity
+            onPress={() => setShow(true)}
+            style={{
+              borderWidth: 1,
+              borderColor: "#ccc",
+              padding: 15,
+              borderRadius: 10,
+            }}
+          >
+            <Text style={{ color: date ? "#000" : "#999" }}>
+              {formattedDate}
+            </Text>
+          </TouchableOpacity>
+          {show && (
+            <DateTimePicker
+              value={date || new Date() || deadline}
+              mode="date"
+              display="spinner"
+              onChange={onChange}
+              design="material"
+            />
+          )}
         </View>
 
         <View className="mt-3">

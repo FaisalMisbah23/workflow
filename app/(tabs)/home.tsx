@@ -2,7 +2,7 @@ import DashboardData from "@/components/DashboardData";
 import { UserContext } from "@/context/UserContext";
 import Ionicons from "@expo/vector-icons/build/Ionicons";
 import { useRouter } from "expo-router";
-import React, { useContext } from "react";
+import { useContext } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -37,9 +37,11 @@ const Home = () => {
     <SafeAreaView>
       <View className="p-5">
         <View className="flex-row justify-between items-center mb-4">
-          <Text className="text-2xl font-semibold">{greeting}</Text>
+          <Text className="text-2xl font-semibold ">{greeting}</Text>
           <View className="w-12 h-12 bg-primary rounded-full items-center justify-center">
-            <Text className="text-white text-center font-semibold">{initials}</Text>
+            <Text className="text-white text-center font-semibold">
+              {initials}
+            </Text>
           </View>
         </View>
         <Text className="text-gray-600 text-base mb-4">
