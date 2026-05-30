@@ -54,3 +54,4 @@ app-example
 # Generated native folders
 /ios
 /android
+.kilo/
