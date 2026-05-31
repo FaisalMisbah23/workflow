@@ -1,14 +1,15 @@
 import { UserContext } from "@/context/UserContext";
 import Ionicons from "@expo/vector-icons/build/Ionicons";
 import { useRouter } from "expo-router";
-import React, { useContext, useState } from "react";
+import { useContext, useState } from "react";
 import {
   Text,
   TextInput,
   ToastAndroid,
   TouchableOpacity,
-  View
+  View,
 } from "react-native";
+import { Bounce } from "react-native-animated-spinkit";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const signin = () => {
@@ -72,11 +73,11 @@ const signin = () => {
         </View>
         <View className="mb-4 gap-3">
           <TouchableOpacity
-            className={`${loading ? "bg-gray-400" : "bg-primary"} rounded-[10px] p-4`}
+            className={`${loading ? "bg-blue-400" : "bg-primary"} rounded-[10px] p-4`}
             onPress={handlelogin}
           >
             {loading ? (
-              <Text className="text-center text-surface">Loading...</Text>
+              <Bounce size={25} color="white" className="text-center mx-auto" />
             ) : (
               <Text className="text-center text-surface">Sign In</Text>
             )}

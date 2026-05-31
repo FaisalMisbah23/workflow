@@ -11,6 +11,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { Bounce } from "react-native-animated-spinkit";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const showToast = (message: string) => {
@@ -101,12 +102,12 @@ const SignUp = () => {
           )}
         </View>
         <TouchableOpacity
-          className={`${loading ? "bg-gray-400" : "bg-primary"} p-5 rounded-[15px]`}
+          className={`${loading ? "bg-blue-400" : "bg-primary"} p-5 rounded-[15px]`}
           onPress={() => SignUpWithEmail()}
           disabled={loading || !email || !password}
         >
           {loading ? (
-            <Text className="text-white text-center">Loading...</Text>
+            <Bounce size={25} color="white" className="text-center mx-auto" />
           ) : (
             <Text className="text-white text-center">Create Account</Text>
           )}
