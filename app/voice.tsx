@@ -1,12 +1,12 @@
-import { extractIntent, executeIntent, transcribeAudio, VoiceIntent } from "@/lib/voiceApi";
 import { UserContext } from "@/context/UserContext";
+import { executeIntent, extractIntent, transcribeAudio, VoiceIntent } from "@/lib/voiceApi";
+import Ionicons from "@expo/vector-icons/build/Ionicons";
+import { Picker } from "@react-native-picker/picker";
 import { Audio } from "expo-av";
 import * as FileSystem from "expo-file-system";
-import Ionicons from "@expo/vector-icons/build/Ionicons";
 import { useContext, useEffect, useRef, useState } from "react";
-import { Alert, Platform, ScrollView, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { Alert, ScrollView, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Picker } from "@react-native-picker/picker";
 
 let globalRecording: Audio.Recording | null = null;
 
