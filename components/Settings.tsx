@@ -1,7 +1,14 @@
 import { UserContext } from "@/context/UserContext";
 import Ionicons from "@expo/vector-icons/build/Ionicons";
-import React, { useContext, useState } from "react";
-import { Modal, ScrollView, Switch, Text, TouchableOpacity, View } from "react-native";
+import { useContext, useState } from "react";
+import {
+  Modal,
+  ScrollView,
+  Switch,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 const Settings = () => {
   const { logout } = useContext(UserContext);
@@ -14,15 +21,31 @@ const Settings = () => {
   });
   const [appSettings, setAppSettings] = useState({
     darkMode: false,
-    language: 'en',
+    language: "en",
   });
 
   const items = [
     { icon: "create-outline" as any, title: "Edit Profile", action: () => {} },
-    { icon: "notifications-outline" as any, title: "Notifications", action: () => setActiveModal('notifications') },
-    { icon: "settings-outline" as any, title: "Settings", action: () => setActiveModal('settings') },
-    { icon: "shield-outline" as any, title: "Privacy & Security", action: () => setActiveModal('privacy') },
-    { icon: "analytics-outline" as any, title: "Analytics", action: () => setActiveModal('analytics') },
+    {
+      icon: "notifications-outline" as any,
+      title: "Notifications",
+      action: () => setActiveModal("notifications"),
+    },
+    {
+      icon: "settings-outline" as any,
+      title: "Settings",
+      action: () => setActiveModal("settings"),
+    },
+    {
+      icon: "shield-outline" as any,
+      title: "Privacy & Security",
+      action: () => setActiveModal("privacy"),
+    },
+    {
+      icon: "analytics-outline" as any,
+      title: "Analytics",
+      action: () => setActiveModal("analytics"),
+    },
     { icon: "exit-outline" as any, title: "Sign Out", action: logout },
   ];
   return (
@@ -34,7 +57,7 @@ const Settings = () => {
             <View className="flex-row items-center gap-3">
               <Ionicons name={item.icon} size={20} />
               {item.title === "Sign Out" ? (
-                <Text className="font-bold text-xl text-red-500">
+                <Text className="font-bold text-[30px] text-red-500">
                   Sign Out
                 </Text>
               ) : (
@@ -51,7 +74,7 @@ const Settings = () => {
 
       {/* Notifications Modal */}
       <Modal
-        visible={activeModal === 'notifications'}
+        visible={activeModal === "notifications"}
         transparent={true}
         animationType="slide"
         onRequestClose={() => setActiveModal(null)}
@@ -69,28 +92,48 @@ const Settings = () => {
                 <Text className="text-base">Email Notifications</Text>
                 <Switch
                   value={notificationSettings.email}
-                  onValueChange={(value) => setNotificationSettings({...notificationSettings, email: value})}
+                  onValueChange={(value) =>
+                    setNotificationSettings({
+                      ...notificationSettings,
+                      email: value,
+                    })
+                  }
                 />
               </View>
               <View className="flex-row justify-between items-center py-3 border-b">
                 <Text className="text-base">Push Notifications</Text>
                 <Switch
                   value={notificationSettings.push}
-                  onValueChange={(value) => setNotificationSettings({...notificationSettings, push: value})}
+                  onValueChange={(value) =>
+                    setNotificationSettings({
+                      ...notificationSettings,
+                      push: value,
+                    })
+                  }
                 />
               </View>
               <View className="flex-row justify-between items-center py-3 border-b">
                 <Text className="text-base">Task Updates</Text>
                 <Switch
                   value={notificationSettings.taskUpdates}
-                  onValueChange={(value) => setNotificationSettings({...notificationSettings, taskUpdates: value})}
+                  onValueChange={(value) =>
+                    setNotificationSettings({
+                      ...notificationSettings,
+                      taskUpdates: value,
+                    })
+                  }
                 />
               </View>
               <View className="flex-row justify-between items-center py-3">
                 <Text className="text-base">Deadline Reminders</Text>
                 <Switch
                   value={notificationSettings.deadlineReminders}
-                  onValueChange={(value) => setNotificationSettings({...notificationSettings, deadlineReminders: value})}
+                  onValueChange={(value) =>
+                    setNotificationSettings({
+                      ...notificationSettings,
+                      deadlineReminders: value,
+                    })
+                  }
                 />
               </View>
             </ScrollView>
@@ -100,7 +143,7 @@ const Settings = () => {
 
       {/* Settings Modal */}
       <Modal
-        visible={activeModal === 'settings'}
+        visible={activeModal === "settings"}
         transparent={true}
         animationType="slide"
         onRequestClose={() => setActiveModal(null)}
@@ -118,23 +161,45 @@ const Settings = () => {
                 <Text className="text-base">Dark Mode</Text>
                 <Switch
                   value={appSettings.darkMode}
-                  onValueChange={(value) => setAppSettings({...appSettings, darkMode: value})}
+                  onValueChange={(value) =>
+                    setAppSettings({ ...appSettings, darkMode: value })
+                  }
                 />
               </View>
               <View className="py-3 border-b">
                 <Text className="text-base mb-2">Language</Text>
                 <View className="flex-row gap-2">
                   <TouchableOpacity
-                    className={`px-3 py-1 rounded ${appSettings.language === 'en' ? 'bg-primary' : 'bg-gray-200'}`}
-                    onPress={() => setAppSettings({...appSettings, language: 'en'})}
+                    className={`px-3 py-1 rounded ${appSettings.language === "en" ? "bg-primary" : "bg-gray-200"}`}
+                    onPress={() =>
+                      setAppSettings({ ...appSettings, language: "en" })
+                    }
                   >
-                    <Text className={appSettings.language === 'en' ? 'text-white' : 'text-black'}>English</Text>
+                    <Text
+                      className={
+                        appSettings.language === "en"
+                          ? "text-white"
+                          : "text-black"
+                      }
+                    >
+                      English
+                    </Text>
                   </TouchableOpacity>
                   <TouchableOpacity
-                    className={`px-3 py-1 rounded ${appSettings.language === 'es' ? 'bg-primary' : 'bg-gray-200'}`}
-                    onPress={() => setAppSettings({...appSettings, language: 'es'})}
+                    className={`px-3 py-1 rounded ${appSettings.language === "es" ? "bg-primary" : "bg-gray-200"}`}
+                    onPress={() =>
+                      setAppSettings({ ...appSettings, language: "es" })
+                    }
                   >
-                    <Text className={appSettings.language === 'es' ? 'text-white' : 'text-black'}>Español</Text>
+                    <Text
+                      className={
+                        appSettings.language === "es"
+                          ? "text-white"
+                          : "text-black"
+                      }
+                    >
+                      Español
+                    </Text>
                   </TouchableOpacity>
                 </View>
               </View>
@@ -145,7 +210,7 @@ const Settings = () => {
 
       {/* Privacy & Security Modal */}
       <Modal
-        visible={activeModal === 'privacy'}
+        visible={activeModal === "privacy"}
         transparent={true}
         animationType="slide"
         onRequestClose={() => setActiveModal(null)}
@@ -178,7 +243,7 @@ const Settings = () => {
 
       {/* Analytics Modal */}
       <Modal
-        visible={activeModal === 'analytics'}
+        visible={activeModal === "analytics"}
         transparent={true}
         animationType="slide"
         onRequestClose={() => setActiveModal(null)}
@@ -206,7 +271,9 @@ const Settings = () => {
               </View>
               <View className="py-3">
                 <Text className="text-base font-semibold">Team Activity</Text>
-                <Text className="text-sm text-gray-500">No recent activity</Text>
+                <Text className="text-sm text-gray-500">
+                  No recent activity
+                </Text>
               </View>
             </ScrollView>
           </View>

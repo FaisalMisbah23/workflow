@@ -17,6 +17,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { Bounce } from "react-native-animated-spinkit";
 import { SafeAreaView } from "react-native-safe-area-context";
 const Profile = () => {
   const router = useRouter();
@@ -35,6 +36,17 @@ const Profile = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [changingPassword, setChangingPassword] = useState(false);
 
+  if (!profile) {
+    return (
+      <SafeAreaView>
+        <Bounce
+          size={45}
+          color="blue"
+          className="flex items-center justify-center text-center mx-auto"
+        />
+      </SafeAreaView>
+    );
+  }
   // Password strength validation
   const validatePasswordStrength = (password: string) => {
     if (password.length < 8) {
@@ -137,6 +149,7 @@ const Profile = () => {
     }
     return true;
   };
+
   const pickImage = async () => {
     if (!isLoggedIn || !user) {
       if (Platform.OS === "android") {
@@ -268,12 +281,12 @@ const Profile = () => {
       <ScrollView className="flex-1">
         <View className="p-5">
           {/* Profile Header Card */}
-          <View className="bg-white rounded-2xl shadow-sm overflow-hidden mb-6">
+          <View className="bg-white rounded-2xl shadow-sm overflow-hidden mb-6 p-3">
             {/* Banner */}
-            <View className="bg-gradient-to-r from-primary to-primary/80 h-32" />
+            <View className="bg-gradient-to-r from-primary to-primary/80 h-28" />
 
             {/* Profile Info */}
-            <View className="px-5 pb-5 -mt-16">
+            <View className="px-5 pb-5 mt-16">
               <View className="flex-row items-end">
                 {/* Avatar */}
                 <View className="relative">
@@ -317,6 +330,7 @@ const Profile = () => {
                         placeholder="Full Name"
                         className="bg-gray-100 border border-gray-200 rounded-lg px-3 py-2 text-base"
                       />
+
                       <TextInput
                         value={editUsername}
                         onChangeText={setEditUsername}

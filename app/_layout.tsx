@@ -5,11 +5,15 @@ import Ionicons from "@expo/vector-icons/build/Ionicons";
 import { Stack, useRouter } from "expo-router";
 import { useContext } from "react";
 import { View } from "react-native";
+import { Bounce } from "react-native-animated-spinkit";
 
 function RootLayoutContent() {
   const router = useRouter();
   const { user } = useContext(UserContext);
 
+  if (!user) {
+    <Bounce size={40} color="blue" />;
+  }
   return (
     <NotificationProvider userId={user?.user?.id}>
       <Stack>

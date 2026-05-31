@@ -1,16 +1,17 @@
 import { UserContext } from "@/context/UserContext";
 import { supabase } from "@/lib/supabase";
 import { useRouter } from "expo-router";
-import React, { useContext, useState } from "react";
+import { useContext, useState } from "react";
 import {
-    Alert,
-    Platform,
-    Text,
-    TextInput,
-    ToastAndroid,
-    TouchableOpacity,
-    View
+  Alert,
+  Platform,
+  Text,
+  TextInput,
+  ToastAndroid,
+  TouchableOpacity,
+  View,
 } from "react-native";
+import { Bounce } from "react-native-animated-spinkit";
 
 const showToast = (message: string) => {
   if (Platform.OS === "android") {
@@ -22,35 +23,42 @@ const showToast = (message: string) => {
 
 const info = () => {
   const [fullname, setFullName] = useState("");
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
   const { user } = useContext(UserContext);
 
   const handleNext = async () => {
-    if (!fullname) {
-      showToast("Please Enter Your fullname.");
-      router.replace("/info");
-      return;
-    }
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    if (!user) {
-      showToast("User not found. Please log in again.");
-      router.replace("/signin");
-      return;
-    }
-    const { error } = await supabase.from("profiles").upsert({
-      id: user.id,
-      fullname: fullname,
-    });
+    setLoading(true);
+    try {
+      if (!fullname) {
+        showToast("Please Enter Your fullname.");
+        router.replace("/info");
+        return;
+      }
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) {
+        showToast("User not found. Please log in again.");
+        router.replace("/signin");
+        return;
+      }
+      const { error } = await supabase.from("profiles").upsert({
+        id: user.id,
+        fullname: fullname,
+      });
 
-    if (error) {
-      showToast(error.message);
-      console.log(error.message);
+      if (error) {
+        showToast(error.message);
+        console.log(error.message);
+      }
+      router.replace("/createorganization");
+      setLoading(false);
+    } catch (error) {
+      setLoading(false);
+      console.log(error);
     }
-    router.replace("/createorganization");
   };
-  console.log(user);
 
   return (
     <View className="absolute top-[220px] w-full">
@@ -66,10 +74,14 @@ const info = () => {
         </View>
         <View>
           <TouchableOpacity
-            className="items-center p-3 bg-primary rounded-lg"
+            className={`items-center p-3 ${loading ? "bg-blue-400" : "bg-primary"} rounded-lg`}
             onPress={() => handleNext()}
           >
-            <Text className="text-white">Next</Text>
+            {loading ? (
+              <Bounce size={25} color="white" className="text-center mx-auto" />
+            ) : (
+              <Text className="text-white">Next</Text>
+            )}
           </TouchableOpacity>
         </View>
       </View>

@@ -8,6 +8,18 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 const Home = () => {
   const { user, profile } = useContext(UserContext) as any;
+
+  if (!user) {
+    return (
+      <SafeAreaView>
+        <Bounce
+          size={45}
+          color="blue"
+          className="flex items-center justify-center text-center mx-auto"
+        />
+      </SafeAreaView>
+    );
+  }
   const getInitials = () => {
     if (profile?.fullname) {
       const parts = profile.fullname.trim().split(/\s+/);

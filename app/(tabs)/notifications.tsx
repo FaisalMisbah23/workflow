@@ -1,8 +1,18 @@
 import { NotificationContext } from "@/context/NotificationContext";
+import { UserContext } from "@/context/UserContext";
 import Ionicons from "@expo/vector-icons/build/Ionicons";
 import { useFocusEffect } from "expo-router";
-import { useContext, useMemo, useState, useCallback } from "react";
-import { RefreshControl, SafeAreaView, ScrollView, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { useCallback, useContext, useMemo, useState } from "react";
+import {
+  RefreshControl,
+  SafeAreaView,
+  ScrollView,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import { Bounce } from "react-native-animated-spinkit";
 
 interface Notification {
   id: string;
@@ -14,31 +24,54 @@ interface Notification {
 }
 
 const Notifications = () => {
-  const { notifications, unreadCount, markAsRead, markAllAsRead, fetchNotifications } = useContext(NotificationContext);
+  const {
+    notifications,
+    unreadCount,
+    markAsRead,
+    markAllAsRead,
+    fetchNotifications,
+  } = useContext(NotificationContext);
   const [filterType, setFilterType] = useState<"all" | "unread">("all");
-  const [filterCategory, setFilterCategory] = useState<"all" | "task_assigned" | "deadline_reminder" | "team_invite" | "comment">("all");
+  const [filterCategory, setFilterCategory] = useState<
+    "all" | "task_assigned" | "deadline_reminder" | "team_invite" | "comment"
+  >("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [refreshing, setRefreshing] = useState(false);
+  const { user } = useContext(UserContext);
+
+  if (!user) {
+    return (
+      <SafeAreaView>
+        <Bounce
+          size={45}
+          color="blue"
+          className="flex items-center justify-center text-center mx-auto"
+        />
+      </SafeAreaView>
+    );
+  }
 
   useFocusEffect(
     useCallback(() => {
       if (fetchNotifications) {
         fetchNotifications();
       }
-    }, [fetchNotifications])
+    }, [fetchNotifications]),
   );
 
   // Filter notifications
   const filteredNotifications = useMemo(() => {
     return notifications.filter((notification: Notification) => {
-      const matchesSearch = 
+      const matchesSearch =
         notification.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
         notification.message?.toLowerCase().includes(searchQuery.toLowerCase());
-      
-      const matchesFilter = filterType === "all" || (filterType === "unread" && !notification.read);
-      
-      const matchesCategory = filterCategory === "all" || notification.type === filterCategory;
-      
+
+      const matchesFilter =
+        filterType === "all" || (filterType === "unread" && !notification.read);
+
+      const matchesCategory =
+        filterCategory === "all" || notification.type === filterCategory;
+
       return matchesSearch && matchesFilter && matchesCategory;
     });
   }, [notifications, searchQuery, filterType, filterCategory]);
@@ -118,14 +151,19 @@ const Notifications = () => {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-white">
+    <SafeAreaView className="flex-1 bg-white p-6">
       {/* Header */}
-      <View className="p-4 border-b border-gray-200">
+      <View className="border-b border-gray-200">
         <View className="flex-row justify-between items-center mb-4">
           <Text className="text-2xl font-bold">Notifications</Text>
           {unreadCount > 0 && (
-            <TouchableOpacity onPress={markAllAsRead} className="bg-blue-500 px-4 py-2 rounded-full">
-              <Text className="text-white text-sm font-medium">Mark all as read</Text>
+            <TouchableOpacity
+              onPress={markAllAsRead}
+              className="bg-blue-500 px-4 py-2 rounded-full"
+            >
+              <Text className="text-white text-sm font-medium">
+                Mark all as read
+              </Text>
             </TouchableOpacity>
           )}
         </View>
@@ -140,7 +178,10 @@ const Notifications = () => {
             onChangeText={setSearchQuery}
           />
           {searchQuery.trim().length > 0 && (
-            <TouchableOpacity onPress={() => setSearchQuery("")} className="p-1">
+            <TouchableOpacity
+              onPress={() => setSearchQuery("")}
+              className="p-1"
+            >
               <Ionicons name="close-circle" size={18} color="#9CA3AF" />
             </TouchableOpacity>
           )}
@@ -152,7 +193,9 @@ const Notifications = () => {
             onPress={() => setFilterType("all")}
             className={`flex-1 py-2 rounded-lg ${filterType === "all" ? "bg-blue-500" : "bg-gray-200"}`}
           >
-            <Text className={`text-center font-medium ${filterType === "all" ? "text-white" : "text-gray-700"}`}>
+            <Text
+              className={`text-center font-medium ${filterType === "all" ? "text-white" : "text-gray-700"}`}
+            >
               All ({notifications.length})
             </Text>
           </TouchableOpacity>
@@ -160,7 +203,9 @@ const Notifications = () => {
             onPress={() => setFilterType("unread")}
             className={`flex-1 py-2 rounded-lg ${filterType === "unread" ? "bg-blue-500" : "bg-gray-200"}`}
           >
-            <Text className={`text-center font-medium ${filterType === "unread" ? "text-white" : "text-gray-700"}`}>
+            <Text
+              className={`text-center font-medium ${filterType === "unread" ? "text-white" : "text-gray-700"}`}
+            >
               Unread ({unreadCount})
             </Text>
           </TouchableOpacity>
@@ -170,14 +215,22 @@ const Notifications = () => {
       {/* Notifications List */}
       <ScrollView
         className="flex-1"
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
       >
         {filteredNotifications.length === 0 ? (
           <View className="flex-1 items-center justify-center py-20">
-            <Ionicons name="notifications-off-outline" size={64} color="#D1D5DB" />
+            <Ionicons
+              name="notifications-off-outline"
+              size={64}
+              color="#D1D5DB"
+            />
             <Text className="text-gray-500 mt-4 text-lg">No notifications</Text>
             <Text className="text-gray-400 text-sm mt-1">
-              {searchQuery ? "Try a different search term" : "You're all caught up!"}
+              {searchQuery
+                ? "Try a different search term"
+                : "You're all caught up!"}
             </Text>
           </View>
         ) : (
@@ -185,14 +238,19 @@ const Notifications = () => {
             {filteredNotifications.map((notification: Notification) => (
               <TouchableOpacity
                 key={notification.id}
-                onPress={() => !notification.read && markAsRead(notification.id)}
+                onPress={() =>
+                  !notification.read && markAsRead(notification.id)
+                }
                 className={`p-4 rounded-xl mb-3 ${notification.read ? "bg-gray-50" : "bg-blue-50 border-l-4 border-blue-500"}`}
               >
                 <View className="flex-row items-start">
                   {/* Icon */}
                   <View
                     className="w-10 h-10 rounded-full items-center justify-center mr-3"
-                    style={{ backgroundColor: getNotificationColor(notification.type) + "20" }}
+                    style={{
+                      backgroundColor:
+                        getNotificationColor(notification.type) + "20",
+                    }}
                   >
                     <Ionicons
                       name={getNotificationIcon(notification.type)}
@@ -204,16 +262,21 @@ const Notifications = () => {
                   {/* Content */}
                   <View className="flex-1">
                     <View className="flex-row justify-between items-start">
-                      <Text className={`font-semibold text-base ${notification.read ? "text-gray-700" : "text-gray-900"}`}>
+                      <Text
+                        className={`font-semibold text-base ${notification.read ? "text-gray-700" : "text-gray-900"}`}
+                      >
                         {notification.title}
                       </Text>
                       {!notification.read && (
                         <View className="w-2 h-2 bg-blue-500 rounded-full ml-2 mt-2" />
                       )}
                     </View>
-                    <Text className="text-gray-600 text-sm mt-1">{notification.message}</Text>
+                    <Text className="text-gray-600 text-sm mt-1">
+                      {notification.message}
+                    </Text>
                     <Text className="text-gray-400 text-xs mt-2">
-                      {notification.created_at && formatTimeAgo(notification.created_at)}
+                      {notification.created_at &&
+                        formatTimeAgo(notification.created_at)}
                     </Text>
                   </View>
                 </View>
