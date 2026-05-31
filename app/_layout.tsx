@@ -1,19 +1,15 @@
-import "@/assets/styles/global.css";
 import NotificationProvider from "@/context/NotificationContext";
 import UserProvider, { UserContext } from "@/context/UserContext";
 import Ionicons from "@expo/vector-icons/build/Ionicons";
 import { Stack, useRouter } from "expo-router";
 import { useContext } from "react";
 import { View } from "react-native";
-import { Bounce } from "react-native-animated-spinkit";
+import "../global.css";
 
 function RootLayoutContent() {
   const router = useRouter();
-  const { user } = useContext(UserContext);
+  const { user } = useContext(UserContext) as any;
 
-  if (!user) {
-    <Bounce size={40} color="blue" />;
-  }
   return (
     <NotificationProvider userId={user?.user?.id}>
       <Stack>

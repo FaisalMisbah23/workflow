@@ -4,23 +4,12 @@ import Ionicons from "@expo/vector-icons/build/Ionicons";
 import { useRouter } from "expo-router";
 import { useContext } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
-import { Bounce } from "react-native-animated-spinkit";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const Home = () => {
   const { user, profile } = useContext(UserContext) as any;
+  const router = useRouter();
 
-  if (!user) {
-    return (
-      <SafeAreaView>
-        <Bounce
-          size={45}
-          color="blue"
-          className="flex items-center justify-center text-center mx-auto"
-        />
-      </SafeAreaView>
-    );
-  }
   const getInitials = () => {
     if (profile?.fullname) {
       const parts = profile.fullname.trim().split(/\s+/);
@@ -33,7 +22,6 @@ const Home = () => {
   };
   const initials = getInitials();
   const hour = new Date().getHours();
-  const router = useRouter();
 
   let greeting = "";
 
@@ -50,7 +38,7 @@ const Home = () => {
     <SafeAreaView>
       <View className="p-5">
         <View className="flex-row justify-between items-center mb-4">
-          <Text className="text-2xl font-semibold ">{greeting}</Text>
+          <Text className="text-4xl font-semibold ">{greeting}</Text>
           <View className="w-12 h-12 bg-primary rounded-full items-center justify-center">
             <Text className="text-white text-center font-semibold">
               {initials}

@@ -85,9 +85,9 @@ const DashboardData = () => {
   };
 
   return (
-    <View className="px-5 pb-5">
-      <View className="flex-row gap-5 flex-wrap">
-        <View className="flex-row justify-between w-[48%] rounded-3xl border border-blue-100 bg-blue-50 p-4">
+    <View className="px-5 pb-5 p-3">
+      <View className="flex-row gap-3 flex-wrap pb-5 ">
+        <View className="flex-row justify-between w-[48%] rounded-lg border border-blue-100 bg-blue-50 p-4">
           <View className="flex-1 gap-2">
             <Text className="text-sm font-medium text-blue-700">
               Active Task
@@ -96,7 +96,13 @@ const DashboardData = () => {
               {activeTasks}
             </Text>
           </View>
-          <View className="mt-1 h-11 w-11 items-center justify-center rounded-2xl bg-white">
+          <View
+            className="flex items-center justify-center bg-white rounded-2xl mt-3"
+            style={{
+              height: 30,
+              width: 30,
+            }}
+          >
             <Ionicons
               name="checkmark-circle-outline"
               size={24}
@@ -104,18 +110,24 @@ const DashboardData = () => {
             />
           </View>
         </View>
-        <View className="flex-row justify-between w-[46%] rounded-3xl border border-rose-100 bg-rose-50 p-4">
+        <View className="flex-row justify-between w-[48%] rounded-lg border border-rose-100 bg-rose-50 p-4">
           <View className="flex-1 gap-2">
             <Text className="text-sm font-medium text-rose-700">Overdue</Text>
             <Text className="text-2xl font-bold text-rose-950">
               {overdueTasks}
             </Text>
           </View>
-          <View className="mt-1 h-11 w-11 items-center justify-center rounded-2xl bg-white">
+          <View
+            className="flex items-center justify-center bg-white rounded-2xl mt-3"
+            style={{
+              height: 30,
+              width: 30,
+            }}
+          >
             <Ionicons name="alert-circle-outline" size={24} color="#E11D48" />
           </View>
         </View>
-        <View className="flex-row justify-between w-[48%] rounded-3xl border border-violet-100 bg-violet-50 p-4">
+        <View className="flex-row justify-between w-[48%] rounded-lg border border-violet-100 bg-violet-50 p-4">
           <View className="flex-1 gap-2">
             <Text className="text-sm font-medium text-violet-700">
               Team Members
@@ -124,11 +136,17 @@ const DashboardData = () => {
               {teamMembers?.length ?? 0}
             </Text>
           </View>
-          <View className="mt-1 h-11 w-11 items-center justify-center rounded-2xl bg-white">
+          <View
+            className="flex items-center justify-center bg-white rounded-2xl mt-3"
+            style={{
+              height: 30,
+              width: 30,
+            }}
+          >
             <Ionicons name="people-outline" size={24} color="#7C3AED" />
           </View>
         </View>
-        <View className="flex-row justify-between w-[46%] rounded-3xl border border-emerald-100 bg-emerald-50 p-4">
+        <View className="flex-row justify-between w-[48%] rounded-lg border border-emerald-100 bg-emerald-50 p-4">
           <View className="flex-1 gap-2">
             <Text className="text-sm font-medium text-emerald-700">
               Completed
@@ -137,13 +155,19 @@ const DashboardData = () => {
               {completedTasks}
             </Text>
           </View>
-          <View className="mt-1 h-11 w-11 items-center justify-center rounded-2xl bg-white">
+          <View
+            className="flex items-center justify-center bg-white rounded-2xl mt-3"
+            style={{
+              height: 30,
+              width: 30,
+            }}
+          >
             <Ionicons name="trending-up" size={24} color="#059669" />
           </View>
         </View>
       </View>
 
-      <View className="mt-5 rounded-3xl border border-gray-200 bg-white p-4 shadow-sm shadow-black/5">
+      <View className="mt-5 rounded-lg border border-gray-200 bg-white p-3 shadow-sm shadow-black/5">
         <View className="flex-row justify-between items-center mb-3">
           <View>
             <Text className="text-lg font-bold text-gray-900">
@@ -157,12 +181,13 @@ const DashboardData = () => {
             <Ionicons name="calendar-outline" size={22} color="#374151" />
           </View>
         </View>
-
-        {upcomingDeadlines.length > 0 ? (
-          upcomingDeadlines.map((task) => (
+      </View>
+      {upcomingDeadlines.length > 0 ? (
+        upcomingDeadlines.map((task) => (
+          <View className="p-3 rounded-lg border-gray-200 bg-white shadow-sm shadow-black mt-2">
             <View
               key={task.id}
-              className="flex-row items-center justify-between border-t border-gray-100 py-3"
+              className="flex-row items-center justify-between border-gray-100 py-3"
             >
               <View className="flex-1 pr-3">
                 <Text className="font-semibold text-base text-gray-900">
@@ -176,16 +201,16 @@ const DashboardData = () => {
                 {formatDeadline(task.deadline)}
               </Text>
             </View>
-          ))
-        ) : (
-          <View className="items-center rounded-2xl bg-gray-50 px-4 py-6">
-            <Ionicons name="sparkles-outline" size={22} color="#6B7280" />
-            <Text className="mt-2 text-center text-sm text-gray-500">
-              No upcoming deadlines.
-            </Text>
           </View>
-        )}
-      </View>
+        ))
+      ) : (
+        <View className="items-center rounded-2xl bg-gray-50 px-4 py-6">
+          <Ionicons name="sparkles-outline" size={22} color="#6B7280" />
+          <Text className="mt-2 text-center text-sm text-gray-500">
+            No upcoming deadlines.
+          </Text>
+        </View>
+      )}
     </View>
   );
 };

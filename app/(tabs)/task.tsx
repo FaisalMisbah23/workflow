@@ -12,10 +12,10 @@ import {
   ScrollView,
   Text,
   TextInput,
+  ToastAndroid,
   TouchableOpacity,
   View,
 } from "react-native";
-import { Bounce } from "react-native-animated-spinkit";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 interface Task {
@@ -58,19 +58,6 @@ const Tasks = () => {
   const buttons = ["All Tasks", "Pending", "In Progress", "Completed"];
   const router = useRouter();
   const { profile, isAdmin, isLead, user } = useContext(UserContext);
-
-  if (!user) {
-    return (
-      <SafeAreaView>
-        <Bounce
-          size={45}
-          color="blue"
-          className="flex items-center justify-center text-center mx-auto"
-        />
-      </SafeAreaView>
-    );
-  }
-
   const fetchTasks = useCallback(async () => {
     try {
       setLoading(true);
@@ -235,7 +222,7 @@ const Tasks = () => {
     } else if (priority === "Medium") {
       classes = "bg-amber-50 text-amber-700 border-amber-200";
     } else if (priority === "Low") {
-      classes = "bg-emerald-50 text-emerald-700 border-emerald-200";
+      classes = "bg-blue-50 text-blue-700 border-blue-200";
     }
     return (
       <View className={`px-2.5 py-0.5 rounded-full border ${classes}`}>
@@ -248,7 +235,7 @@ const Tasks = () => {
     let classes = "bg-gray-50 text-gray-700 border-gray-200";
     let text = "Pending";
     if (status === "pending") {
-      classes = "bg-gray-50 text-gray-600 border-gray-200";
+      classes = "bg-yellow-50 text-gray-600 border-yellow-200";
       text = "Pending";
     } else if (status === "in_progress") {
       classes = "bg-blue-50 text-blue-700 border-blue-200";
@@ -477,13 +464,11 @@ const Tasks = () => {
             filteredTasks.map((task) => (
               <View
                 key={task.id}
-                className="bg-gray-50 p-4 rounded-xl mb-3 border border-gray-200"
+                className="bg-rose-50 p-4 rounded-xl mb-3 border border-gray-200"
               >
                 <View className="flex-row justify-between items-start">
                   <View className="flex-1">
-                    <Text className="text-base font-semibold">
-                      {task.title}
-                    </Text>
+                    <Text className="text-lg font-semibold">{task.title}</Text>
                     {task.description && (
                       <Text className="text-gray-600 mt-1 text-sm">
                         {task.description}
@@ -494,12 +479,12 @@ const Tasks = () => {
                       {renderStatusBadge(task.status)}
                     </View>
                     {task.assigned_to && (
-                      <Text className="text-gray-500 text-xs mt-1">
+                      <Text className="text-gray-500 text-sm mt-1">
                         Assigned to: {task.assigned_to}
                       </Text>
                     )}
                     {task.deadline && (
-                      <Text className="text-orange-600 text-xs mt-1">
+                      <Text className="text-orange-600 text-sm mt-1">
                         Deadline: {new Date(task.deadline).toLocaleDateString()}
                       </Text>
                     )}

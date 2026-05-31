@@ -286,7 +286,7 @@ const Profile = () => {
             <View className="bg-gradient-to-r from-primary to-primary/80 h-28" />
 
             {/* Profile Info */}
-            <View className="px-5 pb-5 mt-16">
+            <View className=" pb-5 -mt-16">
               <View className="flex-row items-end">
                 {/* Avatar */}
                 <View className="relative">
@@ -375,11 +375,16 @@ const Profile = () => {
                       <Text className="text-gray-900 text-lg font-semibold">
                         {profile?.fullname}
                       </Text>
-                      {profile?.username ? (
+                      {profile?.username && (
                         <Text className="text-gray-500 text-sm">
                           @{profile.username}
                         </Text>
-                      ) : null}
+                      )}
+                      {profile?.email && (
+                        <Text className="text-gray-500 text-sm">
+                          {profile.email}
+                        </Text>
+                      )}
                       {profile?.bio && (
                         <Text className="text-gray-600 text-sm mt-1 line-clamp-2">
                           {profile?.bio}

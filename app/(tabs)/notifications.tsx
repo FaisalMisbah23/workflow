@@ -12,7 +12,6 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { Bounce } from "react-native-animated-spinkit";
 
 interface Notification {
   id: string;
@@ -38,18 +37,6 @@ const Notifications = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [refreshing, setRefreshing] = useState(false);
   const { user } = useContext(UserContext);
-
-  if (!user) {
-    return (
-      <SafeAreaView>
-        <Bounce
-          size={45}
-          color="blue"
-          className="flex items-center justify-center text-center mx-auto"
-        />
-      </SafeAreaView>
-    );
-  }
 
   useFocusEffect(
     useCallback(() => {

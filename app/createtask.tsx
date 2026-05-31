@@ -324,7 +324,6 @@ const CreateTask = () => {
               mode="date"
               display="spinner"
               onChange={onChange}
-              design="material"
             />
           )}
         </View>
