@@ -3,8 +3,7 @@ import { UserContext } from "@/context/UserContext";
 import Ionicons from "@expo/vector-icons/build/Ionicons";
 import { useRouter } from "expo-router";
 import { useContext } from "react";
-import { Text, TouchableOpacity, View } from "react-native";
-import { Bounce } from "react-native-animated-spinkit";
+import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const Home = () => {
@@ -46,39 +45,107 @@ const Home = () => {
   } else {
     greeting = "Welcome to Workflow";
   }
+
+  const formattedDate = new Date().toLocaleDateString(undefined, {
+    weekday: "long",
+    month: "short",
+    day: "numeric",
+  });
+
   return (
-    <SafeAreaView>
-      <View className="p-5">
-        <View className="flex-row justify-between items-center mb-4">
-          <Text className="text-2xl font-semibold ">{greeting}</Text>
-          <View className="w-12 h-12 bg-primary rounded-full items-center justify-center">
-            <Text className="text-white text-center font-semibold">
-              {initials}
-            </Text>
+    <SafeAreaView className="flex-1 bg-slate-50">
+      <ScrollView
+        className="flex-1"
+        contentContainerStyle={{ paddingBottom: 32 }}
+        showsVerticalScrollIndicator={false}
+      >
+        <View className="px-5 pt-4">
+          <View className="mb-4 rounded-3xl bg-slate-900 p-5">
+            <View className="mb-5 flex-row items-center justify-between">
+              <View>
+                <Text className="text-xs uppercase tracking-widest text-slate-300">
+                  {formattedDate}
+                </Text>
+                <Text className="mt-1 text-2xl font-bold text-white">
+                  {greeting}
+                </Text>
+              </View>
+              <View className="h-12 w-12 items-center justify-center rounded-2xl bg-white/20">
+                <Text className="text-base font-semibold text-white">{initials}</Text>
+              </View>
+            </View>
+
+            <View className="rounded-2xl border border-white/15 bg-white/10 px-4 py-3">
+              <Text className="text-sm font-medium text-white">
+                Here is your workflow overview
+              </Text>
+              <Text className="mt-1 text-xs text-slate-200">
+                Track progress, deadlines, and team activity from one place.
+              </Text>
+            </View>
           </View>
         </View>
-        <Text className="text-gray-600 text-base mb-4">
-          Here's your workflow overview
-        </Text>
-      </View>
-      <View>
+
         <DashboardData />
-      </View>
-      <View className="flex-row justify-between items-center bg-primary p-5 mx-4 rounded-xl mb-4">
-        <View className="flex-1">
-          <Text className="font-bold text-lg text-white">Quick Actions</Text>
-          <Text className="text-gray-200 text-sm">Get things done faster</Text>
+
+        <View className="mx-5 mt-5 rounded-3xl border border-slate-200 bg-white p-4">
+          <View className="mb-3 flex-row items-center justify-between">
+            <View>
+              <Text className="text-lg font-bold text-slate-900">Quick Actions</Text>
+              <Text className="text-sm text-slate-500">Jump into your most-used flows</Text>
+            </View>
+            <View className="h-10 w-10 items-center justify-center rounded-xl bg-slate-100">
+              <Ionicons name="flash-outline" size={18} color="#0F172A" />
+            </View>
+          </View>
+
+          <View className="flex-row flex-wrap justify-between gap-y-3">
+            <TouchableOpacity
+              className="w-[48%] rounded-2xl bg-blue-600 px-4 py-4"
+              onPress={() => router.push("/createtask")}
+            >
+              <View className="mb-2 h-9 w-9 items-center justify-center rounded-xl bg-white/20">
+                <Ionicons name="add" size={20} color="white" />
+              </View>
+              <Text className="text-base font-semibold text-white">New Task</Text>
+              <Text className="mt-1 text-xs text-blue-100">Create and assign work</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              className="w-[48%] rounded-2xl bg-emerald-600 px-4 py-4"
+              onPress={() => router.push("/voice")}
+            >
+              <View className="mb-2 h-9 w-9 items-center justify-center rounded-xl bg-white/20">
+                <Ionicons name="mic" size={18} color="white" />
+              </View>
+              <Text className="text-base font-semibold text-white">Voice AI</Text>
+              <Text className="mt-1 text-xs text-emerald-100">Create tasks by speaking</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              className="w-[48%] rounded-2xl bg-violet-600 px-4 py-4"
+              onPress={() => router.push("/createtask")}
+            >
+              <View className="mb-2 h-9 w-9 items-center justify-center rounded-xl bg-white/20">
+                <Ionicons name="flag-outline" size={18} color="white" />
+              </View>
+              <Text className="text-base font-semibold text-white">High Priority</Text>
+              <Text className="mt-1 text-xs text-violet-100">Capture urgent tasks fast</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              className="w-[48%] rounded-2xl bg-slate-800 px-4 py-4"
+              onPress={() => router.push("/(tabs)/team")}
+            >
+              <View className="mb-2 h-9 w-9 items-center justify-center rounded-xl bg-white/20">
+                <Ionicons name="people-outline" size={18} color="white" />
+              </View>
+              <Text className="text-base font-semibold text-white">Team</Text>
+              <Text className="mt-1 text-xs text-slate-300">Review members and roles</Text>
+            </TouchableOpacity>
+          </View>
         </View>
-        <View className="ml-4">
-          <TouchableOpacity
-            className="flex-row items-center gap-2 bg-white/20 px-4 py-2 rounded-lg"
-            onPress={() => router.push("/createtask")}
-          >
-            <Ionicons name="add" size={20} color={"white"} />
-            <Text className="text-white font-medium">New Task</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
+      </ScrollView>
     </SafeAreaView>
   );
 };

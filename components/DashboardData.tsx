@@ -62,10 +62,6 @@ const DashboardData = () => {
               .limit(5),
           ]);
 
-        console.log("Dashboard fetch - Active tasks:", activeRes);
-        console.log("Dashboard fetch - User ID:", userId);
-        console.log("Dashboard fetch - User Email:", userEmail);
-
         setActiveTasks(activeRes.count ?? 0);
         setOverdueTasks(overdueRes.count ?? 0);
         setCompletedTasks(completedRes.count ?? 0);
@@ -84,13 +80,19 @@ const DashboardData = () => {
     });
   };
 
+  const getPriorityBadgeClass = (priority: string | null) => {
+    if (priority === "High") return "bg-rose-100 text-rose-700";
+    if (priority === "Low") return "bg-emerald-100 text-emerald-700";
+    return "bg-amber-100 text-amber-700";
+  };
+
   return (
-    <View className="px-5 pb-5">
-      <View className="flex-row gap-5 flex-wrap">
+    <View className="px-5">
+      <View className="flex-row flex-wrap justify-between gap-y-3">
         <View className="flex-row justify-between w-[48%] rounded-3xl border border-blue-100 bg-blue-50 p-4">
           <View className="flex-1 gap-2">
             <Text className="text-sm font-medium text-blue-700">
-              Active Task
+              Active Tasks
             </Text>
             <Text className="text-2xl font-bold text-blue-950">
               {activeTasks}
@@ -104,7 +106,7 @@ const DashboardData = () => {
             />
           </View>
         </View>
-        <View className="flex-row justify-between w-[46%] rounded-3xl border border-rose-100 bg-rose-50 p-4">
+        <View className="flex-row justify-between w-[48%] rounded-3xl border border-rose-100 bg-rose-50 p-4">
           <View className="flex-1 gap-2">
             <Text className="text-sm font-medium text-rose-700">Overdue</Text>
             <Text className="text-2xl font-bold text-rose-950">
@@ -128,7 +130,7 @@ const DashboardData = () => {
             <Ionicons name="people-outline" size={24} color="#7C3AED" />
           </View>
         </View>
-        <View className="flex-row justify-between w-[46%] rounded-3xl border border-emerald-100 bg-emerald-50 p-4">
+        <View className="flex-row justify-between w-[48%] rounded-3xl border border-emerald-100 bg-emerald-50 p-4">
           <View className="flex-1 gap-2">
             <Text className="text-sm font-medium text-emerald-700">
               Completed
@@ -168,13 +170,25 @@ const DashboardData = () => {
                 <Text className="font-semibold text-base text-gray-900">
                   {task.title}
                 </Text>
-                <Text className="text-sm text-gray-500">
-                  {task.priority ?? "Medium"} priority
+                <View className="mt-1 flex-row items-center gap-2">
+                  <Text
+                    className={`rounded-full px-2 py-0.5 text-xs font-medium ${getPriorityBadgeClass(
+                      task.priority,
+                    )}`}
+                  >
+                    {task.priority ?? "Medium"}
+                  </Text>
+                  <Text className="text-xs text-gray-500">priority</Text>
+                </View>
+              </View>
+              <View className="items-end">
+                <Text className="text-xs uppercase tracking-wide text-gray-400">
+                  Deadline
+                </Text>
+                <Text className="text-sm font-semibold text-gray-700">
+                  {formatDeadline(task.deadline)}
                 </Text>
               </View>
-              <Text className="text-sm font-medium text-gray-600">
-                {formatDeadline(task.deadline)}
-              </Text>
             </View>
           ))
         ) : (
