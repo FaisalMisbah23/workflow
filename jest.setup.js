@@ -3,26 +3,10 @@
  * Configuration and global mocks for React Native Testing
  */
 
-// Mock react-native-css-interop and its dependencies FIRST
-jest.mock('react-native-css-interop', () => ({
-  wrapJsx: (jsx) => jsx,
-  createInteropElement: (type, props) => ({ type, props }),
-  useColorScheme: () => 'light',
-  vars: () => ({}),
-}));
+// Note: We don't globally mock 'react-native-css-interop' here to avoid
+// Babel/Jest transform conflicts. Individual tests can mock it if needed.
 
-// Mock the native modules that css-interop depends on
-jest.mock('react-native/Libraries/Utilities/NativeAppearance', () => ({
-  getColorScheme: () => 'light',
-  addChangeListener: () => ({ remove: jest.fn() }),
-}));
-
-jest.mock('react-native/Libraries/Utilities/Appearance', () => ({
-  getColorScheme: () => 'light',
-  addChangeListener: () => ({ remove: jest.fn() }),
-}));
-
-import '@testing-library/jest-native/extend-expect';
+require('@testing-library/jest-native/extend-expect');
 
 // ============================================
 // GLOBAL MOCKS
@@ -172,11 +156,8 @@ jest.mock('expo-constants', () => ({
   },
 }));
 
-jest.mock('@react-native-picker/picker', () => ({
-  Picker: {
-    Item: ({ label, value }) => null,
-  },
-}));
+// Note: '@react-native-picker/picker' is mocked above with a component implementation.
+// Avoid duplicate mocks here to prevent factory conflicts in Jest.
 
 // ============================================
 // SUPABASE MOCK

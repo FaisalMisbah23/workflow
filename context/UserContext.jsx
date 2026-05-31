@@ -252,9 +252,13 @@ const UserProvider = ({ children }) => {
   const uploadImage = async (localUri, userId) => {
     try {
       // read file as base64
-      const base64 = await FileSystem.readAsStringAsync(localUri, {
-        encoding: FileSystem.EncodingType.Base64,
-      });
+       const base64 = await FileSystem.readAsStringAsync(localUri, {
+         encoding: FileSystem.EncodingType.Base64,
+       });
+
+       if (typeof base64 !== 'string') {
+         throw new Error('Failed to read image file as base64 string');
+       }
 
       const fileName = `avatars/${userId}_${Date.now()}.jpg`;
 
