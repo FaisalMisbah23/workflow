@@ -4,7 +4,7 @@ import { supabase } from "@/lib/supabase";
 import Ionicons from "@expo/vector-icons/build/Ionicons";
 import { Picker } from "@react-native-picker/picker";
 import { useFocusEffect, useRouter } from "expo-router";
-import React, { useCallback, useContext, useState } from "react";
+import { useCallback, useContext, useState } from "react";
 import {
   Alert,
   Modal,
@@ -13,8 +13,9 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  View
+  View,
 } from "react-native";
+import { Bounce } from "react-native-animated-spinkit";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 interface Task {
@@ -58,36 +59,52 @@ const Tasks = () => {
   const router = useRouter();
   const { profile, isAdmin, isLead, user } = useContext(UserContext);
 
+  if (!user) {
+    return (
+      <SafeAreaView>
+        <Bounce
+          size={45}
+          color="blue"
+          className="flex items-center justify-center text-center mx-auto"
+        />
+      </SafeAreaView>
+    );
+  }
+
   const fetchTasks = useCallback(async () => {
     try {
       setLoading(true);
-      
+
       // Get current user
-      const { data: { user: currentUser } } = await supabase.auth.getUser();
-      
+      const {
+        data: { user: currentUser },
+      } = await supabase.auth.getUser();
+
       if (!currentUser) {
         console.log("No user logged in");
         return;
       }
-      
+
       // Build query based on role
       let query = supabase
         .from("tasks")
         .select("*")
         .order("created_at", { ascending: false });
-      
+
       // If member (not admin/lead), only fetch their assigned tasks
-      if (profile?.role === 'member') {
+      if (profile?.role === "member") {
         const memberEmail = currentUser.email?.toLowerCase();
         if (memberEmail) {
           query = query.or(
-            `assigned_to_user_id.eq.${currentUser.id},assigned_to.eq.${memberEmail},created_by.eq.${currentUser.id}`
+            `assigned_to_user_id.eq.${currentUser.id},assigned_to.eq.${memberEmail},created_by.eq.${currentUser.id}`,
           );
         } else {
-          query = query.or(`assigned_to_user_id.eq.${currentUser.id},created_by.eq.${currentUser.id}`);
+          query = query.or(
+            `assigned_to_user_id.eq.${currentUser.id},created_by.eq.${currentUser.id}`,
+          );
         }
       }
-      
+
       const { data, error } = await query;
 
       if (error) {
@@ -112,39 +129,35 @@ const Tasks = () => {
   useFocusEffect(
     useCallback(() => {
       fetchTasks();
-    }, [fetchTasks])
+    }, [fetchTasks]),
   );
 
   const deleteTask = async (taskId: string) => {
-    Alert.alert(
-      "Delete Task",
-      "Are you sure you want to delete this task?",
-      [
-        { text: "Cancel", style: "cancel" },
-        {
-          text: "Delete",
-          style: "destructive",
-          onPress: async () => {
-            try {
-              const { error } = await supabase
-                .from("tasks")
-                .delete()
-                .eq("id", taskId);
+    Alert.alert("Delete Task", "Are you sure you want to delete this task?", [
+      { text: "Cancel", style: "cancel" },
+      {
+        text: "Delete",
+        style: "destructive",
+        onPress: async () => {
+          try {
+            const { error } = await supabase
+              .from("tasks")
+              .delete()
+              .eq("id", taskId);
 
-              if (error) {
-                showToast(error.message);
-                return;
-              }
-
-              showToast("Task deleted");
-              setTasks(tasks.filter((t) => t.id !== taskId));
-            } catch (err) {
-              showToast("Failed to delete task");
+            if (error) {
+              showToast(error.message);
+              return;
             }
-          },
+
+            showToast("Task deleted");
+            setTasks(tasks.filter((t) => t.id !== taskId));
+          } catch (err) {
+            showToast("Failed to delete task");
+          }
         },
-      ]
-    );
+      },
+    ]);
   };
 
   const openEditModal = (task: Task) => {
@@ -208,7 +221,7 @@ const Tasks = () => {
         (t) =>
           t.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
           (t.description &&
-            t.description.toLowerCase().includes(searchQuery.toLowerCase()))
+            t.description.toLowerCase().includes(searchQuery.toLowerCase())),
       );
     }
 
@@ -289,9 +302,16 @@ const Tasks = () => {
   };
 
   const filteredTasks = getFilteredTasks();
-  const treeTasks = viewMode === "tree" ? buildTreeStructure(filteredTasks) : filteredTasks;
+  const treeTasks =
+    viewMode === "tree" ? buildTreeStructure(filteredTasks) : filteredTasks;
 
-  const TaskTreeNode = ({ task, level = 0 }: { task: Task; level?: number }) => {
+  const TaskTreeNode = ({
+    task,
+    level = 0,
+  }: {
+    task: Task;
+    level?: number;
+  }) => {
     const hasChildren = task.children && task.children.length > 0;
     const isExpanded = expandedNodes.has(task.id);
 
@@ -376,10 +396,12 @@ const Tasks = () => {
               className="flex-row gap-2 bg-gray-100 px-3 py-2 rounded-lg ml-3 items-center"
               onPress={() => setViewMode(viewMode === "list" ? "tree" : "list")}
             >
-              <Ionicons 
-                name={viewMode === "list" ? "list-outline" : "git-network-outline"} 
-                size={20} 
-                color="#6B7280" 
+              <Ionicons
+                name={
+                  viewMode === "list" ? "list-outline" : "git-network-outline"
+                }
+                size={20}
+                color="#6B7280"
               />
             </TouchableOpacity>
             <TouchableOpacity
@@ -392,7 +414,7 @@ const Tasks = () => {
           </View>
         </View>
 
-        <View className="flex-row items-center border border-gray-200 bg-gray-100 p-3 rounded-lg mb-4">
+        <View className="flex-row items-center border border-gray-200 bg-gray-100 px-3 rounded-lg mb-4">
           <Ionicons name="search" size={20} color="#6B7280" />
           <TextInput
             className="flex-1 ml-2 text-base bg-transparent border-0 outline-none"
@@ -402,7 +424,10 @@ const Tasks = () => {
             onChangeText={setSearchQuery}
           />
           {searchQuery.trim().length > 0 && (
-            <TouchableOpacity onPress={() => setSearchQuery("")} className="p-1">
+            <TouchableOpacity
+              onPress={() => setSearchQuery("")}
+              className="p-1"
+            >
               <Ionicons name="close-circle" size={18} color="#9CA3AF" />
             </TouchableOpacity>
           )}
@@ -420,7 +445,9 @@ const Tasks = () => {
                 onPress={() => setActiveIndex(index)}
                 key={index}
                 className={`rounded-lg px-4 py-2 mr-3 ${
-                  isActive ? "bg-primary" : "bg-transparent border border-primary"
+                  isActive
+                    ? "bg-primary"
+                    : "bg-transparent border border-primary"
                 }`}
               >
                 <Text
@@ -440,14 +467,12 @@ const Tasks = () => {
           // }
         >
           {treeTasks.length === 0 ? (
-            <View className="items-center justify-center ">
+            <View className=" items-center justify-center">
               <Ionicons name="clipboard-outline" size={60} color="#ccc" />
               <Text className="text-gray-400 mt-4 text-lg">No tasks found</Text>
             </View>
           ) : viewMode === "tree" ? (
-            treeTasks.map((task) => (
-              <TaskTreeNode key={task.id} task={task} />
-            ))
+            treeTasks.map((task) => <TaskTreeNode key={task.id} task={task} />)
           ) : (
             filteredTasks.map((task) => (
               <View
@@ -456,7 +481,9 @@ const Tasks = () => {
               >
                 <View className="flex-row justify-between items-start">
                   <View className="flex-1">
-                    <Text className="text-base font-semibold">{task.title}</Text>
+                    <Text className="text-base font-semibold">
+                      {task.title}
+                    </Text>
                     {task.description && (
                       <Text className="text-gray-600 mt-1 text-sm">
                         {task.description}
@@ -482,13 +509,21 @@ const Tasks = () => {
                       onPress={() => openEditModal(task)}
                       className="p-2"
                     >
-                      <Ionicons name="create-outline" size={20} color="#6B7280" />
+                      <Ionicons
+                        name="create-outline"
+                        size={20}
+                        color="#6B7280"
+                      />
                     </TouchableOpacity>
                     <TouchableOpacity
                       onPress={() => deleteTask(task.id)}
                       className="p-2"
                     >
-                      <Ionicons name="trash-outline" size={20} color="#EF4444" />
+                      <Ionicons
+                        name="trash-outline"
+                        size={20}
+                        color="#EF4444"
+                      />
                     </TouchableOpacity>
                   </View>
                 </View>
@@ -514,7 +549,9 @@ const Tasks = () => {
               </TouchableOpacity>
             </View>
 
-            <Text className="text-sm font-semibold text-gray-700 mb-1">Title</Text>
+            <Text className="text-sm font-semibold text-gray-700 mb-1">
+              Title
+            </Text>
             <TextInput
               className="border border-gray-300 rounded-lg p-3 mb-3 text-base"
               value={editTitle}
@@ -522,7 +559,9 @@ const Tasks = () => {
               placeholder="Task title"
             />
 
-            <Text className="text-sm font-semibold text-gray-700 mb-1">Description</Text>
+            <Text className="text-sm font-semibold text-gray-700 mb-1">
+              Description
+            </Text>
             <TextInput
               className="border border-gray-300 rounded-lg p-3 mb-3 text-base"
               value={editDescription}
@@ -532,7 +571,9 @@ const Tasks = () => {
               numberOfLines={3}
             />
 
-            <Text className="text-sm font-semibold text-gray-700 mb-1">Priority</Text>
+            <Text className="text-sm font-semibold text-gray-700 mb-1">
+              Priority
+            </Text>
             <View className="border border-gray-300 rounded-lg mb-3">
               <Picker
                 selectedValue={editPriority}
@@ -544,7 +585,9 @@ const Tasks = () => {
               </Picker>
             </View>
 
-            <Text className="text-sm font-semibold text-gray-700 mb-1">Status</Text>
+            <Text className="text-sm font-semibold text-gray-700 mb-1">
+              Status
+            </Text>
             <View className="border border-gray-300 rounded-lg mb-3">
               <Picker
                 selectedValue={editStatus}
@@ -556,7 +599,9 @@ const Tasks = () => {
               </Picker>
             </View>
 
-            <Text className="text-sm font-semibold text-gray-700 mb-1">Deadline</Text>
+            <Text className="text-sm font-semibold text-gray-700 mb-1">
+              Deadline
+            </Text>
             <TextInput
               className="border border-gray-300 rounded-lg p-3 mb-4 text-base"
               value={editDeadline}
