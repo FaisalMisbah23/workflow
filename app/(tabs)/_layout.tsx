@@ -54,6 +54,9 @@ const _layout = () => {
         tabBarStyle: {
           height: 60,
           paddingTop: 5,
+          borderRadius: 20,
+          shadowColor: "white",
+          backgroundColor: "#1e1e1e",
         },
         tabBarLabelStyle: {
           fontSize: 10,

@@ -1,25 +1,35 @@
-import { Alert, Platform, ToastAndroid } from "react-native";
+import { Alert } from "react-native";
+import Toast from "react-native-toast-message";
 
 export const showToast = (
   message: string,
-  duration: "SHORT" | "LONG" = "SHORT",
+  type: "success" | "error" | "info" = "success",
 ) => {
-  if (Platform.OS === "android") {
-    ToastAndroid.show(
-      message,
-      duration === "SHORT" ? ToastAndroid.SHORT : ToastAndroid.LONG,
-    );
-  } else {
-    Alert.alert("", message);
-  }
+  Toast.show({
+    type: type,
+    text1: message,
+    position: "top",
+    visibilityTime: 3000,
+    autoHide: true,
+  });
 };
 
 export const showError = (message: string) => {
-  Alert.alert("Error", message);
+  Toast.show({
+    type: "error",
+    text1: message,
+    position: "top",
+    visibilityTime: 3000,
+  });
 };
 
 export const showSuccess = (message: string) => {
-  Alert.alert("Success", message);
+  Toast.show({
+    type: "success",
+    text1: message,
+    position: "top",
+    visibilityTime: 3000,
+  });
 };
 
 export const showConfirm = (

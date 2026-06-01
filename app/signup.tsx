@@ -1,26 +1,19 @@
 import { supabase } from "@/lib/supabase.js";
+import { showToast } from "@/utils/toast";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useRouter } from "expo-router";
 import { useState } from "react";
-import {
-  Alert,
-  Platform,
-  Text,
-  TextInput,
-  ToastAndroid,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { Text, TextInput, TouchableOpacity, View } from "react-native";
 import { Bounce } from "react-native-animated-spinkit";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-const showToast = (message: string) => {
-  if (Platform.OS === "android") {
-    ToastAndroid.show(message, ToastAndroid.SHORT);
-  } else {
-    Alert.alert("", message);
-  }
-};
+// const showToast = (message: string) => {
+//   if (Platform.OS === "android") {
+//     ToastAndroid.show(message, ToastAndroid.SHORT);
+//   } else {
+//     Alert.alert("", message);
+//   }
+// };
 
 const SignUp = () => {
   const [email, setEmail] = useState("");
@@ -34,12 +27,12 @@ const SignUp = () => {
     try {
       setloading(true);
       if (!email || !password) {
-        showToast("Fill all fields!");
+        showToast("Fill all fields!", "error");
         setloading(false);
         return;
       }
       if (password.length < 8) {
-        showToast("Password must be at least 8 characters");
+        showToast("Password must be at least 8 characters", "error");
         setloading(false);
         return;
       }
@@ -48,12 +41,12 @@ const SignUp = () => {
         password,
       });
       if (error) {
-        showToast(error.message);
+        showToast(error.message, "error");
         console.log(error);
         return;
       }
 
-      showToast("Account created! Please sign in to continue.");
+      showToast("Account created! Please sign in to continue.", "success");
       router.replace("/signin");
     } catch (error: any) {
       console.log(error);

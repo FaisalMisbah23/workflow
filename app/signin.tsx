@@ -1,14 +1,9 @@
 import { UserContext } from "@/context/UserContext";
+import { showToast } from "@/utils/toast";
 import Ionicons from "@expo/vector-icons/build/Ionicons";
 import { useRouter } from "expo-router";
 import { useContext, useState } from "react";
-import {
-  Text,
-  TextInput,
-  ToastAndroid,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { Text, TextInput, TouchableOpacity, View } from "react-native";
 import { Bounce } from "react-native-animated-spinkit";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -21,7 +16,7 @@ const signin = () => {
 
   const handlelogin = () => {
     if (!email || !password) {
-      ToastAndroid.show("Fill all fields", ToastAndroid.SHORT);
+      showToast("Fill all fields", "error");
       return;
     }
     login(email, password);
