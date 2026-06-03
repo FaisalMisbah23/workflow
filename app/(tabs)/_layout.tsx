@@ -5,7 +5,9 @@ import { Tabs, useFocusEffect, useRouter } from "expo-router";
 import React, { useContext, useEffect } from "react";
 
 const _layout = () => {
-  const { isLoggedIn, loading, user, profile, setProfile, setOrg } = useContext(UserContext) as any;
+  const { isLoggedIn, loading, user, profile, setProfile, setOrg } = useContext(
+    UserContext,
+  ) as any;
   const router = useRouter();
 
   useEffect(() => {
@@ -36,7 +38,7 @@ const _layout = () => {
       };
 
       verifyOrganizationAccess();
-    }, [isLoggedIn, user?.user?.id, profile?.org_id])
+    }, [isLoggedIn, user?.user?.id, profile?.org_id]),
   );
 
   if (loading) {
@@ -50,8 +52,9 @@ const _layout = () => {
         tabBarActiveTintColor: "#000",
         tabBarInactiveTintColor: "#cdcde0",
         tabBarStyle: {
-          height: 60,
+          height: 65,
           paddingTop: 5,
+          borderRadius: 15,
         },
         tabBarLabelStyle: {
           fontSize: 10,

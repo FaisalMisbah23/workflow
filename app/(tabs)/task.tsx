@@ -1,6 +1,7 @@
 import NotificationBell from "@/components/NotificationBell";
 import { UserContext } from "@/context/UserContext";
 import { supabase } from "@/lib/supabase";
+import { showToast } from "@/utils/toast";
 import Ionicons from "@expo/vector-icons/build/Ionicons";
 import { Picker } from "@react-native-picker/picker";
 import { useFocusEffect, useRouter } from "expo-router";
@@ -8,7 +9,6 @@ import { useCallback, useContext, useState } from "react";
 import {
   Alert,
   Modal,
-  Platform,
   ScrollView,
   Text,
   TextInput,
@@ -31,13 +31,13 @@ interface Task {
   children?: Task[];
 }
 
-const showToast = (message: string) => {
-  if (Platform.OS === "android") {
-    ToastAndroid.show(message, ToastAndroid.SHORT);
-  } else {
-    Alert.alert("", message);
-  }
-};
+// const showToast = (message: string) => {
+//   if (Platform.OS === "android") {
+//     ToastAndroid.show(message, ToastAndroid.SHORT);
+//   } else {
+//     Alert.alert("", message);
+//   }
+// };
 
 const Tasks = () => {
   const [activeIndex, setActiveIndex] = useState(0);
@@ -146,14 +146,14 @@ const Tasks = () => {
               .eq("id", taskId);
 
             if (error) {
-              showToast(error.message);
+              showToast(error.message, "error");
               return;
             }
 
-            showToast("Task deleted");
+            showToast("Task deleted", "success");
             setTasks(tasks.filter((t) => t.id !== taskId));
           } catch (err) {
-            showToast("Failed to delete task");
+            showToast("Failed to delete task", "error");
           }
         },
       },
@@ -174,7 +174,7 @@ const Tasks = () => {
     if (!editingTask) return;
 
     if (!editTitle.trim()) {
-      showToast("Please enter task title");
+      showToast("Please enter task title", "error");
       return;
     }
 
