@@ -36,6 +36,21 @@ const isPermissionError = (error: any) => {
   );
 };
 
+const formatAssigneeLabel = (item: any) => {
+  const fullname = item?.fullname?.trim?.();
+  const email = item?.email?.trim?.();
+
+  if (
+    fullname &&
+    email &&
+    fullname.toLowerCase() !== email.toLowerCase()
+  ) {
+    return `${fullname} (${email})`;
+  }
+
+  return fullname || email || "Unknown";
+};
+
 const CreateTask = () => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -295,7 +310,7 @@ const CreateTask = () => {
                 assignableUsers.map((item: any, index: number) => (
                   <Picker.Item
                     key={index}
-                    label={item.fullname || item.email || "Unknown"}
+                    label={formatAssigneeLabel(item)}
                     value={item.email || item.id}
                   />
                 ))}

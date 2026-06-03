@@ -90,6 +90,30 @@ describe('Task Operations Integration', () => {
   });
 
   describe('Admin Task Creation', () => {
+    it('shows assignee fullname as primary label with email fallback in picker', () => {
+      const adminContext = {
+        user: { user: { id: mockAdminProfile.id, email: 'admin@example.com' } },
+        profile: mockAdminProfile,
+        isAdmin: true,
+        isLead: false,
+        teamMembers: [],
+        getAssignableUsers: () => ([
+          { id: 'user-1', fullname: 'Faisal Misbah', email: 'faisal@example.com' },
+          { id: 'user-2', email: 'noname@example.com' },
+        ]),
+        canAssignTask: () => true,
+      };
+
+      const { getByText } = render(
+        <UserContext.Provider value={adminContext}>
+          <CreateTask />
+        </UserContext.Provider>
+      );
+
+      expect(getByText('Faisal Misbah (faisal@example.com)')).toBeTruthy();
+      expect(getByText('noname@example.com')).toBeTruthy();
+    });
+
     it('should allow admin to create and assign task to any user', async () => {
       const adminContext = {
         user: { user: { id: mockAdminProfile.id, email: 'admin@example.com' } },

@@ -25,6 +25,7 @@ interface Task {
   priority: string;
   status: string;
   assigned_to: string | null;
+  assigned_to_user_id?: string | null;
   deadline: string | null;
   created_at: string;
   parent_task_id: string | null;
@@ -57,7 +58,8 @@ const Tasks = () => {
 
   const buttons = ["All Tasks", "Pending", "In Progress", "Completed"];
   const router = useRouter();
-  const { profile, isAdmin, isLead, user } = useContext(UserContext);
+  const { profile, isAdmin, isLead, user, teamMembers = [] } =
+    useContext(UserContext);
 
   if (!user) {
     return (
@@ -228,6 +230,29 @@ const Tasks = () => {
     return filtered;
   };
 
+  const getAssigneeLabel = (task: Task) => {
+    const taskEmail = task.assigned_to?.trim?.() || "";
+    const taskAssigneeId = task.assigned_to_user_id || null;
+
+    const matchedAssignee = teamMembers.find((member: any) => {
+      const memberEmail = member?.email?.toLowerCase?.() || "";
+      return (
+        (taskAssigneeId && member?.id === taskAssigneeId) ||
+        (taskEmail && memberEmail === taskEmail.toLowerCase())
+      );
+    });
+
+    const fullname =
+      matchedAssignee?.fullname?.trim?.() ||
+      (taskAssigneeId === user?.user?.id ? profile?.fullname?.trim?.() : "");
+
+    if (fullname && taskEmail && fullname.toLowerCase() !== taskEmail.toLowerCase()) {
+      return `${fullname} (${taskEmail})`;
+    }
+
+    return fullname || taskEmail || null;
+  };
+
   const renderPriorityBadge = (priority: string) => {
     let classes = "bg-gray-50 text-gray-700 border-gray-200";
     if (priority === "High") {
@@ -346,9 +371,9 @@ const Tasks = () => {
                   {renderPriorityBadge(task.priority)}
                   {renderStatusBadge(task.status)}
                 </View>
-                {task.assigned_to && (
+                {getAssigneeLabel(task) && (
                   <Text className="text-gray-500 text-xs mt-1">
-                    Assigned to: {task.assigned_to}
+                    Assigned to: {getAssigneeLabel(task)}
                   </Text>
                 )}
                 {task.deadline && (
@@ -493,9 +518,9 @@ const Tasks = () => {
                       {renderPriorityBadge(task.priority)}
                       {renderStatusBadge(task.status)}
                     </View>
-                    {task.assigned_to && (
+                    {getAssigneeLabel(task) && (
                       <Text className="text-gray-500 text-xs mt-1">
-                        Assigned to: {task.assigned_to}
+                        Assigned to: {getAssigneeLabel(task)}
                       </Text>
                     )}
                     {task.deadline && (
