@@ -4,107 +4,122 @@ import UserProvider, { UserContext } from "@/context/UserContext";
 import Ionicons from "@expo/vector-icons/build/Ionicons";
 import { Stack, useRouter } from "expo-router";
 import { useContext } from "react";
-import { View } from "react-native";
+import { useColorScheme, View } from "react-native";
 import { Bounce } from "react-native-animated-spinkit";
+import Toast from "react-native-toast-message";
 
 function RootLayoutContent() {
   const router = useRouter();
   const { user } = useContext(UserContext);
-
+  const isDarkMode = useColorScheme() === "dark";
   if (!user) {
     <Bounce size={40} color="blue" />;
   }
   return (
-    <NotificationProvider userId={user?.user?.id}>
-      <Stack>
-        <Stack.Screen name="index" options={{ headerShown: false }} />
-        <Stack.Screen
-          name="signup"
-          options={{
-            title: "Create Account",
-            headerTitleStyle: { fontWeight: 600 },
-            headerLeft: () => (
-              <View>
-                <Ionicons
-                  name="arrow-back"
-                  size={26}
-                  onPress={() => router.back()}
-                />
-              </View>
-            ),
-          }}
-        />
-        <Stack.Screen
-          name="signin"
-          options={{
-            title: "Sign In",
-            headerTitleStyle: { fontWeight: 600 },
-            headerLeft: () => (
-              <View>
-                <Ionicons
-                  name="arrow-back"
-                  size={26}
-                  onPress={() => router.back()}
-                />
-              </View>
-            ),
-          }}
-        />
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen
-          name="createtask"
-          options={{ title: "Create New Task" }}
-        />
-        <Stack.Screen
-          name="createorganization"
-          options={{ title: "Create Your Organization" }}
-        />
-        <Stack.Screen
-          name="info"
-          options={{ title: "Profile", headerTitleAlign: "center" }}
-        />
-        <Stack.Screen
-          name="notifications"
-          options={{ title: "Notifications" }}
-        />
-        <Stack.Screen
-          name="invite/[token]"
-          options={{ title: "Accept Invitation", headerShown: false }}
-        />
-        <Stack.Screen
-          name="forgotpassword"
-          options={{
-            title: "Forgot Password",
-            headerTitleStyle: { fontWeight: 600 },
-            headerLeft: () => (
-              <View>
-                <Ionicons
-                  name="arrow-back"
-                  size={26}
-                  onPress={() => router.back()}
-                />
-              </View>
-            ),
-          }}
-        />
-        <Stack.Screen
-          name="resetpassword"
-          options={{
-            title: "Reset Password",
-            headerTitleStyle: { fontWeight: 600 },
-            headerLeft: () => (
-              <View>
-                <Ionicons
-                  name="arrow-back"
-                  size={26}
-                  onPress={() => router.back()}
-                />
-              </View>
-            ),
-          }}
-        />
-      </Stack>
-    </NotificationProvider>
+    <>
+      <NotificationProvider userId={user?.user?.id}>
+        <Stack>
+          <Stack.Screen name="index" options={{ headerShown: false }} />
+          <Stack.Screen
+            name="signup"
+            options={{
+              title: "Create Account",
+              headerTitleStyle: { fontWeight: 600 },
+              headerStyle: {
+                backgroundColor: isDarkMode ? "#1F2937" : "#fff",
+              },
+              headerTintColor: isDarkMode ? "#fff" : "#000",
+              headerLeft: () => (
+                <View>
+                  <Ionicons
+                    name="arrow-back"
+                    size={26}
+                    color={isDarkMode ? "#fff" : "#000"}
+                    onPress={() => router.back()}
+                  />
+                </View>
+              ),
+            }}
+          />
+          <Stack.Screen
+            name="signin"
+            options={{
+              title: "Sign In",
+              headerTitleStyle: { fontWeight: 600 },
+              headerStyle: {
+                backgroundColor: isDarkMode ? "#1F2937" : "#fff",
+              },
+              headerTintColor: isDarkMode ? "#fff" : "#000",
+              headerShadowVisible: false,
+              headerLeft: () => (
+                <View>
+                  <Ionicons
+                    name="arrow-back"
+                    size={26}
+                    color={isDarkMode ? "#fff" : "#000"}
+                    onPress={() => router.back()}
+                  />
+                </View>
+              ),
+            }}
+          />
+          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          <Stack.Screen
+            name="createtask"
+            options={{ title: "Create New Task" }}
+          />
+          <Stack.Screen
+            name="createorganization"
+            options={{ title: "Create Your Organization" }}
+          />
+          <Stack.Screen
+            name="info"
+            options={{ title: "Profile", headerTitleAlign: "center" }}
+          />
+          <Stack.Screen
+            name="notifications"
+            options={{ title: "Notifications" }}
+          />
+          <Stack.Screen
+            name="invite/[token]"
+            options={{ title: "Accept Invitation", headerShown: false }}
+          />
+          <Stack.Screen
+            name="forgotpassword"
+            options={{
+              title: "Forgot Password",
+              headerTitleStyle: { fontWeight: 600 },
+              headerLeft: () => (
+                <View>
+                  <Ionicons
+                    name="arrow-back"
+                    size={26}
+                    onPress={() => router.back()}
+                  />
+                </View>
+              ),
+            }}
+          />
+          <Stack.Screen
+            name="resetpassword"
+            options={{
+              title: "Reset Password",
+              headerTitleStyle: { fontWeight: 600 },
+              headerLeft: () => (
+                <View>
+                  <Ionicons
+                    name="arrow-back"
+                    size={26}
+                    onPress={() => router.back()}
+                  />
+                </View>
+              ),
+            }}
+          />
+        </Stack>
+      </NotificationProvider>
+      <Toast />
+    </>
   );
 }
 

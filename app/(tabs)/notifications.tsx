@@ -169,7 +169,7 @@ const Notifications = () => {
         </View>
 
         {/* Search */}
-        <View className="flex-row items-center bg-gray-100 rounded-lg px-4 py-3 mb-3">
+        <View className="flex-row items-center bg-gray-100 rounded-lg px-4 py-2 mb-3">
           <Ionicons name="search" size={20} color="#9CA3AF" />
           <TextInput
             className="flex-1 ml-2 text-base bg-transparent border-0 outline-none"
@@ -234,7 +234,7 @@ const Notifications = () => {
             </Text>
           </View>
         ) : (
-          <View className="p-4">
+          <View className="mt-4">
             {filteredNotifications.map((notification: Notification) => (
               <TouchableOpacity
                 key={notification.id}
@@ -260,7 +260,7 @@ const Notifications = () => {
                   </View>
 
                   {/* Content */}
-                  <View className="flex-1">
+                  <View className="flex-1 ">
                     <View className="flex-row justify-between items-start">
                       <Text
                         className={`font-semibold text-base ${notification.read ? "text-gray-700" : "text-gray-900"}`}

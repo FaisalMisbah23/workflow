@@ -281,12 +281,12 @@ const Profile = () => {
       <ScrollView className="flex-1">
         <View className="p-5">
           {/* Profile Header Card */}
-          <View className="bg-white rounded-2xl shadow-sm overflow-hidden mb-6 p-3">
+          <View className="bg-white rounded-2xl shadow-sm overflow-hidden mb-6  flex items-center">
             {/* Banner */}
-            <View className="bg-gradient-to-r from-primary to-primary/80 h-28" />
+            <View className="bg-gradient-to-r from-primary to-primary/80 h-20" />
 
             {/* Profile Info */}
-            <View className="px-5 pb-5 mt-16">
+            <View className="px-4 relative bottom-14 w-full">
               <View className="flex-row items-end">
                 {/* Avatar */}
                 <View className="relative">
@@ -380,6 +380,11 @@ const Profile = () => {
                           @{profile.username}
                         </Text>
                       ) : null}
+                      {profile?.email ? (
+                        <Text className="text-gray-500 text-sm">
+                          @{profile.email}
+                        </Text>
+                      ) : null}
                       {profile?.bio && (
                         <Text className="text-gray-600 text-sm mt-1 line-clamp-2">
                           {profile?.bio}
@@ -395,17 +400,17 @@ const Profile = () => {
                 <View className="mt-4 flex-row gap-2">
                   <TouchableOpacity
                     onPress={() => setIsEditing(true)}
-                    className="flex-1 bg-primary py-2.5 rounded-lg"
+                    className="flex items-center justify-center w-1/3 bg-primary  rounded-lg"
                   >
-                    <Text className="text-white text-center font-medium text-sm">
+                    <Text className="text-white text-center font-medium text-md">
                       Edit Profile
                     </Text>
                   </TouchableOpacity>
                   <TouchableOpacity
                     onPress={() => setShowChangePassword(true)}
-                    className="flex-1 bg-gray-200 py-2.5 rounded-lg"
+                    className="flex items-center justify-center w-[120px] bg-gray-200  rounded-lg"
                   >
-                    <Text className="text-gray-700 text-center font-medium text-sm">
+                    <Text className="text-gray-700 text-center font-medium text-md">
                       Change Password
                     </Text>
                   </TouchableOpacity>

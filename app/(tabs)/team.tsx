@@ -317,7 +317,7 @@ const Team = () => {
                       className="p-2"
                     >
                       <Ionicons
-                        name="person-remove-outline"
+                        name="trash-outline"
                         size={24}
                         color="#EF4444"
                       />

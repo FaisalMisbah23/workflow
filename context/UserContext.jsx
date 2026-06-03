@@ -1,19 +1,20 @@
 import { supabase } from "@/lib/supabase";
+import { showToast } from "@/utils/toast";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as FileSystem from "expo-file-system";
+import * as Linking from "expo-linking";
 import { useRouter } from "expo-router";
 import React, { createContext, useEffect, useState } from "react";
-import { Alert, Platform, ToastAndroid } from "react-native";
-import * as Linking from "expo-linking";
+import { Platform } from "react-native";
 export const UserContext = createContext();
 
-const showToast = (message) => {
-  if (Platform.OS === "android") {
-    ToastAndroid.show(message, ToastAndroid.SHORT);
-  } else {
-    Alert.alert("", message);
-  }
-};
+// const showToast = (message) => {
+//   if (Platform.OS === "android") {
+//     ToastAndroid.show(message, ToastAndroid.SHORT);
+//   } else {
+//     Alert.alert("", message);
+//   }
+// };
 
 const UserProvider = ({ children }) => {
   const [user, setUser] = useState(null);
@@ -41,25 +42,30 @@ const UserProvider = ({ children }) => {
         // Parse URL to check for recovery token
         const url = new URL(initialUrl);
         const hashParams = new URLSearchParams(url.hash.substring(1));
-        const type = hashParams.get('type');
-        const accessToken = hashParams.get('access_token');
+        const type = hashParams.get("type");
+        const accessToken = hashParams.get("access_token");
 
-        if (type === 'recovery' && accessToken) {
-          console.log('Recovery token detected in URL, forcing Supabase to process...');
+        if (type === "recovery" && accessToken) {
+          console.log(
+            "Recovery token detected in URL, forcing Supabase to process...",
+          );
           // Force Supabase to check and create session from the recovery token
           const { data, error } = await supabase.auth.getSession();
           if (error) {
-            console.error('Error getting session:', error);
+            console.error("Error getting session:", error);
             return;
           }
-          console.log('Session after recovery token processing:', data?.session?.user?.id);
+          console.log(
+            "Session after recovery token processing:",
+            data?.session?.user?.id,
+          );
         }
       } catch (error) {
-        console.error('Error handling deep link:', error);
+        console.error("Error handling deep link:", error);
       }
     };
 
-    if (Platform.OS === 'web') {
+    if (Platform.OS === "web") {
       handleDeepLink();
     }
   }, []);
@@ -70,11 +76,13 @@ const UserProvider = ({ children }) => {
         if (session?.user) {
           setUser(session);
           setIsLoggedIn(true);
-          
+
           // Handle password recovery flow
-          if (event === 'PASSWORD_RECOVERY') {
-            console.log('PASSWORD_RECOVERY event detected, navigating to reset password page');
-            router.replace('/resetpassword');
+          if (event === "PASSWORD_RECOVERY") {
+            console.log(
+              "PASSWORD_RECOVERY event detected, navigating to reset password page",
+            );
+            router.replace("/resetpassword");
           }
         } else {
           setUser(null);
@@ -91,28 +99,28 @@ const UserProvider = ({ children }) => {
   const fetchTeamMembers = async (profileData = profile) => {
     if (!profileData || !user) return;
     // Only fetch team members if user is a lead or admin
-    if (!profileData?.role || profileData.role === 'member') {
+    if (!profileData?.role || profileData.role === "member") {
       setTeamMembers([]);
       return;
     }
-    
+
     let query = supabase
       .from("profiles")
       .select("id, fullname, email, role, lead_id, org_id")
       .eq("org_id", profileData.org_id);
-    
+
     // If lead, only get their team members
-    if (profileData.role === 'lead') {
+    if (profileData.role === "lead") {
       query = query.eq("lead_id", user.user.id);
     }
-    
+
     const { data, error } = await query;
-    
+
     if (error) {
       console.log("TEAM MEMBERS ERROR:", error.message);
       return;
     }
-    
+
     setTeamMembers(data || []);
   };
 
@@ -134,10 +142,10 @@ const UserProvider = ({ children }) => {
       console.log("PROFILE DATA:", data);
       setProfile(data);
       setAvatarUrl(data?.avatar_url || null);
-      
+
       // Set role flags
-      setIsAdmin(data?.role === 'admin');
-      setIsLead(data?.role === 'lead');
+      setIsAdmin(data?.role === "admin");
+      setIsLead(data?.role === "lead");
     };
 
     const fetchOrganizations = async () => {
@@ -200,7 +208,7 @@ const UserProvider = ({ children }) => {
       });
 
       if (error || !data) {
-        showToast("Invalid email");
+        showToast("Invalid email or password", "error");
         return;
       }
 
@@ -219,24 +227,24 @@ const UserProvider = ({ children }) => {
 
       if (profileError || !profileData || !profileData.fullname) {
         // No profile or no fullname, go to info page
-        showToast("Login Successful");
+        showToast("Login Successful", "success");
         router.replace("/info");
         return;
       }
 
       if (!profileData.org_id) {
         // Profile exists but no organization, go to create organization
-        showToast("Login Successful");
+        showToast("Login Successful", "success");
         router.replace("/createorganization");
         return;
       }
 
       // Profile and organization exist, go to home
-      showToast("Login Successful");
+      showToast("Login Successful", "success");
       router.replace("/(tabs)/home");
     } catch (err) {
       console.log(err);
-        showToast("Login error");
+      showToast("Login error", "error");
     } finally {
       setLoading(false);
     }
@@ -244,6 +252,7 @@ const UserProvider = ({ children }) => {
 
   const logout = async () => {
     await AsyncStorage.removeItem("user");
+    showToast("Logged out successfully", "success");
     setUser(null);
     setIsLoggedIn(false);
     router.replace("/signin");
@@ -252,13 +261,13 @@ const UserProvider = ({ children }) => {
   const uploadImage = async (localUri, userId) => {
     try {
       // read file as base64
-       const base64 = await FileSystem.readAsStringAsync(localUri, {
-         encoding: FileSystem.EncodingType.Base64,
-       });
+      const base64 = await FileSystem.readAsStringAsync(localUri, {
+        encoding: FileSystem.EncodingType.Base64,
+      });
 
-       if (typeof base64 !== 'string') {
-         throw new Error('Failed to read image file as base64 string');
-       }
+      if (typeof base64 !== "string") {
+        throw new Error("Failed to read image file as base64 string");
+      }
 
       const fileName = `avatars/${userId}_${Date.now()}.jpg`;
 
@@ -297,21 +306,25 @@ const UserProvider = ({ children }) => {
 
   if (!initialized) return null;
 
-  const sendInvite = async (email, orgId, role = 'member') => {
+  const sendInvite = async (email, orgId, role = "member") => {
     try {
       const normalizedEmail = email.trim().toLowerCase();
 
-      const { data: existingInvite, error: existingInviteError } = await supabase
-        .from("invites")
-        .select("id")
-        .eq("org_id", orgId)
-        .eq("email", normalizedEmail)
-        .limit(1);
+      const { data: existingInvite, error: existingInviteError } =
+        await supabase
+          .from("invites")
+          .select("id")
+          .eq("org_id", orgId)
+          .eq("email", normalizedEmail)
+          .limit(1);
 
       if (existingInviteError) throw existingInviteError;
 
       if (existingInvite && existingInvite.length > 0) {
-        return { success: false, error: "This email has already been invited." };
+        return {
+          success: false,
+          error: "This email has already been invited.",
+        };
       }
 
       const { data, error: insertError } = await supabase
@@ -330,7 +343,13 @@ const UserProvider = ({ children }) => {
       const { error: funcerror } = await supabase.functions.invoke(
         "send-invite",
         {
-          body: { email: normalizedEmail, orgId, token: data.token, userId: user.user.id, role },
+          body: {
+            email: normalizedEmail,
+            orgId,
+            token: data.token,
+            userId: user.user.id,
+            role,
+          },
         },
       );
 
@@ -345,19 +364,19 @@ const UserProvider = ({ children }) => {
   // Assign task with hierarchy validation
   const canAssignTask = (assigneeEmail) => {
     if (!profile || !assigneeEmail) return false;
-    
+
     // Admin can assign to anyone in org
-    if (profile.role === 'admin') return true;
-    
+    if (profile.role === "admin") return true;
+
     // Lead can assign to their team members
-    if (profile.role === 'lead') {
-      const isTeamMember = teamMembers.some(m => {
+    if (profile.role === "lead") {
+      const isTeamMember = teamMembers.some((m) => {
         // Check if assignee is a team member
-        return m.id && m.role === 'member';
+        return m.id && m.role === "member";
       });
       return isTeamMember;
     }
-    
+
     // Member can only self-assign
     return assigneeEmail === user.user.email;
   };
@@ -365,19 +384,21 @@ const UserProvider = ({ children }) => {
   // Get assignable users based on role
   const getAssignableUsers = () => {
     if (!profile) return [];
-    
-    if (profile.role === 'admin') {
+
+    if (profile.role === "admin") {
       // Admin can see everyone in org
       return teamMembers;
     }
-    
-    if (profile.role === 'lead') {
+
+    if (profile.role === "lead") {
       // Lead can see their team members
-      return teamMembers.filter(m => m.lead_id === user.user.id);
+      return teamMembers.filter((m) => m.lead_id === user.user.id);
     }
-    
+
     // Member can only assign to self
-    return [{ id: user.user.id, fullname: profile.fullname, email: user.user.email }];
+    return [
+      { id: user.user.id, fullname: profile.fullname, email: user.user.email },
+    ];
   };
   return (
     <UserContext.Provider
