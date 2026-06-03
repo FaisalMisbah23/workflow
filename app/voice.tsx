@@ -1,12 +1,25 @@
 import { UserContext } from "@/context/UserContext";
-import { executeIntent, extractIntent, transcribeAudio, VoiceIntent } from "@/lib/voiceApi";
+import {
+  executeIntent,
+  extractIntent,
+  transcribeAudio,
+  VoiceIntent,
+} from "@/lib/voiceApi";
 import Ionicons from "@expo/vector-icons/build/Ionicons";
 import { Picker } from "@react-native-picker/picker";
 import { Audio } from "expo-av";
-import * as FileSystem from "expo-file-system";
+import * as FileSystem from "expo-file-system/legacy";
 import { useContext, useEffect, useRef, useState } from "react";
-import { Alert, ScrollView, Text, TextInput, TouchableOpacity, View } from "react-native";
+import {
+  Alert,
+  ScrollView,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import Toast from "react-native-toast-message";
 
 let globalRecording: Audio.Recording | null = null;
 
@@ -17,7 +30,9 @@ const Voice = () => {
   const [transcript, setTranscript] = useState("");
   const [intent, setIntent] = useState<VoiceIntent | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [recordingPhase, setRecordingPhase] = useState<"idle" | "preparing" | "recording" | "stopping">("idle");
+  const [recordingPhase, setRecordingPhase] = useState<
+    "idle" | "preparing" | "recording" | "stopping"
+  >("idle");
   const recordingRef = useRef<Audio.Recording | null>(null);
   const isPreparingRef = useRef(false);
   const isStoppingRef = useRef(false);
@@ -46,7 +61,12 @@ const Voice = () => {
   }, []);
 
   const startRecording = async () => {
-    if (loading || recordingRef.current || isPreparingRef.current || isStoppingRef.current) {
+    if (
+      loading ||
+      recordingRef.current ||
+      isPreparingRef.current ||
+      isStoppingRef.current
+    ) {
       return;
     }
 
@@ -65,7 +85,11 @@ const Voice = () => {
 
       const permission = await Audio.requestPermissionsAsync();
       if (!permission.granted) {
-        Alert.alert("Permission required", "Microphone permission is needed.");
+        Toast.show({
+          text1: "Permission required",
+          text2: "Microphone permission is needed.",
+          type: "info",
+        });
         setRecordingPhase("idle");
         return;
       }
@@ -77,7 +101,9 @@ const Voice = () => {
 
       const newRecording = new Audio.Recording();
       globalRecording = newRecording;
-      await newRecording.prepareToRecordAsync(Audio.RecordingOptionsPresets.HIGH_QUALITY);
+      await newRecording.prepareToRecordAsync(
+        Audio.RecordingOptionsPresets.HIGH_QUALITY,
+      );
       await newRecording.startAsync();
       recordingRef.current = newRecording;
       setRecording(newRecording);
@@ -93,7 +119,12 @@ const Voice = () => {
   };
 
   const stopRecording = async () => {
-    if (!recordingRef.current || isPreparingRef.current || isStoppingRef.current) return;
+    if (
+      !recordingRef.current ||
+      isPreparingRef.current ||
+      isStoppingRef.current
+    )
+      return;
 
     const activeRecording = recordingRef.current;
     isStoppingRef.current = true;
@@ -103,6 +134,7 @@ const Voice = () => {
     try {
       await activeRecording.stopAndUnloadAsync();
       const uri = activeRecording.getURI();
+      console.log("Recording stopped, file saved at:", uri);
       recordingRef.current = null;
       globalRecording = null;
       setRecording(null);
@@ -112,21 +144,26 @@ const Voice = () => {
       });
 
       if (!uri) {
-        setError("Recording failed to save.");
+        setError("No audio file found. Please try again.");
         return;
       }
 
-       const base64 = await FileSystem.readAsStringAsync(uri, {
-         encoding: FileSystem.EncodingType.Base64,
-       });
+      const fileInfo = await FileSystem.getInfoAsync(uri);
 
-       if (typeof base64 !== 'string') {
-         throw new Error('Failed to read audio file as base64 string');
-       }
+      console.log("FILE EXISTS:", fileInfo.exists);
+
+      const base64 = await FileSystem.readAsStringAsync(uri, {
+        encoding: FileSystem.EncodingType.Base64,
+      });
+      console.log("BASE64 LENGTH:", base64?.length);
+
+      if (typeof base64 !== "string") {
+        throw new Error("Failed to read audio file as base64 string");
+      }
 
       const transcribe = await transcribeAudio({
         audioBase64: base64,
-        mimeType: "audio/m4a",
+        mimeType: "audio/mp4",
         locale: "en-US",
       });
 
@@ -160,7 +197,10 @@ const Voice = () => {
     void stopRecording();
   };
 
-  const updateIntentField = (field: keyof VoiceIntent["entities"], value: any) => {
+  const updateIntentField = (
+    field: keyof VoiceIntent["entities"],
+    value: any,
+  ) => {
     if (!intent) return;
     setIntent({
       ...intent,
@@ -190,29 +230,35 @@ const Voice = () => {
     <SafeAreaView className="flex-1 bg-white">
       <ScrollView className="p-5">
         <Text className="text-2xl font-semibold mb-2">Voice Assistant</Text>
-        <Text className="text-gray-600 mb-5">Hold to record and create a task.</Text>
+        <Text className="text-gray-600 mb-5">
+          Hold to record and create a task.
+        </Text>
 
         <TouchableOpacity
           className={`items-center justify-center h-16 rounded-xl ${recording ? "bg-red-500" : "bg-primary"}`}
           onPressIn={handlePressIn}
           onPressOut={handlePressOut}
-          disabled={loading || recordingPhase === "preparing" || recordingPhase === "stopping"}
+          disabled={
+            loading ||
+            recordingPhase === "preparing" ||
+            recordingPhase === "stopping"
+          }
         >
           <View className="flex-row items-center gap-2">
-            <Ionicons name={recording ? "mic" : "mic-outline"} size={22} color="white" />
+            <Ionicons
+              name={recording ? "mic" : "mic-outline"}
+              size={22}
+              color="white"
+            />
             <Text className="text-white font-semibold">
               {recording ? "Recording..." : "Hold to Talk"}
             </Text>
           </View>
         </TouchableOpacity>
 
-        {loading && (
-          <Text className="text-gray-500 mt-4">Processing...</Text>
-        )}
+        {loading && <Text className="text-gray-500 mt-4">Processing...</Text>}
 
-        {error && (
-          <Text className="text-red-500 mt-4">{error}</Text>
-        )}
+        {error && <Text className="text-red-500 mt-4">{error}</Text>}
 
         {transcript.length > 0 && (
           <View className="mt-6">
@@ -261,7 +307,9 @@ const Voice = () => {
               onChangeText={(val) => updateIntentField("assigneeName", val)}
             />
 
-            <Text className="text-xs text-gray-500 mb-1">Deadline (ISO or YYYY-MM-DD)</Text>
+            <Text className="text-xs text-gray-500 mb-1">
+              Deadline (ISO or YYYY-MM-DD)
+            </Text>
             <TextInput
               className="border border-gray-200 rounded-lg p-3 mb-4"
               value={intent.entities.deadlineIso || ""}
