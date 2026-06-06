@@ -1,13 +1,14 @@
 import { NotificationContext } from "@/context/NotificationContext";
+import { ThemeContext } from "@/context/ThemeContext";
 import Ionicons from "@expo/vector-icons/build/Ionicons";
 import { useRouter } from "expo-router";
 import React, { useContext } from "react";
 import {
-    SafeAreaView,
-    ScrollView,
-    Text,
-    TouchableOpacity,
-    View,
+  SafeAreaView,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 
 interface Notification {
@@ -21,10 +22,13 @@ interface Notification {
 }
 
 const Notifications = () => {
-  const { notifications, markAsRead, markAllAsRead } = useContext(NotificationContext);
+  const { notifications, markAsRead, markAllAsRead } =
+    useContext(NotificationContext);
   const router = useRouter();
-
-  const getIconName = (type: string): React.ComponentProps<typeof Ionicons>['name'] => {
+  const { isDark } = useContext(ThemeContext);
+  const getIconName = (
+    type: string,
+  ): React.ComponentProps<typeof Ionicons>["name"] => {
     switch (type) {
       case "task_assigned":
         return "clipboard-outline";
@@ -51,7 +55,7 @@ const Notifications = () => {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-white">
+    <SafeAreaView className={`flex-1 ${isDark ? "bg-gray-900" : "bg-white"}`}>
       <View className="p-4 border-b border-gray-200">
         <View className="flex-row justify-between items-center">
           <TouchableOpacity onPress={() => router.back()}>
@@ -61,7 +65,8 @@ const Notifications = () => {
           <TouchableOpacity onPress={markAllAsRead}>
             <Text className="text-primary text-sm">Mark all read</Text>
           </TouchableOpacity>
-        </View>: Notification
+        </View>
+        : Notification
       </View>
 
       <ScrollView className="flex-1">
@@ -89,7 +94,9 @@ const Notifications = () => {
               <View className="flex-row items-start">
                 <View
                   className="w-10 h-10 rounded-full items-center justify-center mr-3"
-                  style={{ backgroundColor: getIconColor(notification.type) + "20" }}
+                  style={{
+                    backgroundColor: getIconColor(notification.type) + "20",
+                  }}
                 >
                   <Ionicons
                     name={getIconName(notification.type)}

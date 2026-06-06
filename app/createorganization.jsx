@@ -75,14 +75,14 @@ const createorganization = () => {
     }
   };
   return (
-    <View className="absolute top-[220px] w-full">
-      <View className="p-5">
+    <View className="flex-1 relative w-full dark:bg-gray-900">
+      <View className="p-5 mt-auto mb-auto">
         <View className="gap-3 mb-4">
-          <Text className="text-xl">Organization</Text>
+          <Text className="text-xl dark:text-white">Organization</Text>
           <TextInput
             value={organization}
             onChangeText={(text) => setOrganization(text)}
-            className="bg-surface border border-secondary rounded-lg shadow-sm p-4"
+            className="dark:text-white dark:placeholder:text-gray-200 border border-secondary dark:border-white rounded-lg shadow-sm p-4"
             placeholder="Make Your Organization"
           />
         </View>

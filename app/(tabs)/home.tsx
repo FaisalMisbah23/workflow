@@ -1,14 +1,16 @@
 import DashboardData from "@/components/DashboardData";
+import { ThemeContext } from "@/context/ThemeContext";
 import { UserContext } from "@/context/UserContext";
 import Ionicons from "@expo/vector-icons/build/Ionicons";
 import { useRouter } from "expo-router";
 import { useContext } from "react";
 import { ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { Bounce } from "react-native-animated-spinkit";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const Home = () => {
   const { user, profile } = useContext(UserContext) as any;
-
+  const { isDark } = useContext(ThemeContext) as any;
   if (!user) {
     return (
       <SafeAreaView>
@@ -53,14 +55,18 @@ const Home = () => {
   });
 
   return (
-    <SafeAreaView className="flex-1 bg-slate-50">
+    <SafeAreaView
+      className={`flex-1 ${isDark ? "bg-gray-900" : "bg-slate-50"} `}
+    >
       <ScrollView
         className="flex-1"
         contentContainerStyle={{ paddingBottom: 32 }}
         showsVerticalScrollIndicator={false}
       >
         <View className="px-5 pt-4">
-          <View className="mb-4 rounded-3xl bg-slate-900 p-5">
+          <View
+            className={`mb-4 rounded-3xl ${isDark ? "bg-gray-800" : "bg-gray-900"} p-5`}
+          >
             <View className="mb-5 flex-row items-center justify-between">
               <View>
                 <Text className="text-xs uppercase tracking-widest text-slate-300">
@@ -70,12 +76,18 @@ const Home = () => {
                   {greeting}
                 </Text>
               </View>
-              <View className="h-12 w-12 items-center justify-center rounded-2xl bg-white/20">
-                <Text className="text-base font-semibold text-white">{initials}</Text>
+              <View
+                className={`h-12 w-12 items-center justify-center rounded-2xl ${isDark ? "bg-gray-600" : "bg-gray-800"}`}
+              >
+                <Text className="text-base font-semibold text-white">
+                  {initials}
+                </Text>
               </View>
             </View>
 
-            <View className="rounded-2xl border border-white/15 bg-white/10 px-4 py-3">
+            <View
+              className={`rounded-2xl border ${isDark ? "border-white/15" : "border-gray-800"} ${isDark ? "bg-gray-800" : "bg-white/10"} px-4 py-3`}
+            >
               <Text className="text-sm font-medium text-white">
                 Here is your workflow overview
               </Text>
@@ -86,13 +98,21 @@ const Home = () => {
           </View>
         </View>
 
-        <DashboardData />
+        <DashboardData isDark={isDark} />
 
-        <View className="mx-5 mt-5 rounded-3xl border border-slate-200 bg-white p-4">
+        <View
+          className={`mx-5 mt-5 rounded-3xl border ${isDark ? "border-white" : "border-slate-200"} ${isDark ? "bg-gray-400" : "bg-white"} p-4`}
+        >
           <View className="mb-3 flex-row items-center justify-between">
             <View>
-              <Text className="text-lg font-bold text-slate-900">Quick Actions</Text>
-              <Text className="text-sm text-slate-500">Jump into your most-used flows</Text>
+              <Text className="text-lg font-bold text-slate-900">
+                Quick Actions
+              </Text>
+              <Text
+                className={`text-sm ${isDark ? "text-gray-300" : "text-gray-500"}`}
+              >
+                Jump into your most-used flows
+              </Text>
             </View>
             <View className="h-10 w-10 items-center justify-center rounded-xl bg-slate-100">
               <Ionicons name="flash-outline" size={18} color="#0F172A" />
@@ -107,8 +127,12 @@ const Home = () => {
               <View className="mb-2 h-9 w-9 items-center justify-center rounded-xl bg-white/20">
                 <Ionicons name="add" size={20} color="white" />
               </View>
-              <Text className="text-base font-semibold text-white">New Task</Text>
-              <Text className="mt-1 text-xs text-blue-100">Create and assign work</Text>
+              <Text className="text-base font-semibold text-white">
+                New Task
+              </Text>
+              <Text className="mt-1 text-xs text-blue-100">
+                Create and assign work
+              </Text>
             </TouchableOpacity>
 
             <TouchableOpacity
@@ -118,8 +142,12 @@ const Home = () => {
               <View className="mb-2 h-9 w-9 items-center justify-center rounded-xl bg-white/20">
                 <Ionicons name="mic" size={18} color="white" />
               </View>
-              <Text className="text-base font-semibold text-white">Voice AI</Text>
-              <Text className="mt-1 text-xs text-emerald-100">Create tasks by speaking</Text>
+              <Text className="text-base font-semibold text-white">
+                Voice AI
+              </Text>
+              <Text className="mt-1 text-xs text-emerald-100">
+                Create tasks by speaking
+              </Text>
             </TouchableOpacity>
 
             <TouchableOpacity
@@ -129,8 +157,12 @@ const Home = () => {
               <View className="mb-2 h-9 w-9 items-center justify-center rounded-xl bg-white/20">
                 <Ionicons name="flag-outline" size={18} color="white" />
               </View>
-              <Text className="text-base font-semibold text-white">High Priority</Text>
-              <Text className="mt-1 text-xs text-violet-100">Capture urgent tasks fast</Text>
+              <Text className="text-base font-semibold text-white">
+                High Priority
+              </Text>
+              <Text className="mt-1 text-xs text-violet-100">
+                Capture urgent tasks fast
+              </Text>
             </TouchableOpacity>
 
             <TouchableOpacity
@@ -141,7 +173,9 @@ const Home = () => {
                 <Ionicons name="people-outline" size={18} color="white" />
               </View>
               <Text className="text-base font-semibold text-white">Team</Text>
-              <Text className="mt-1 text-xs text-slate-300">Review members and roles</Text>
+              <Text className="mt-1 text-xs text-slate-300">
+                Review members and roles
+              </Text>
             </TouchableOpacity>
           </View>
         </View>

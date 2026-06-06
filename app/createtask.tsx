@@ -1,3 +1,4 @@
+import { ThemeContext } from "@/context/ThemeContext";
 import { UserContext } from "@/context/UserContext";
 import { supabase } from "@/lib/supabase";
 import DateTimePicker from "@react-native-community/datetimepicker";
@@ -46,6 +47,7 @@ const CreateTask = () => {
   const [assignableUsers, setAssignableUsers] = useState([]);
   const [date, setDate] = useState<Date | null>(null);
   const [show, setShow] = useState(false);
+  const { isDark } = useContext(ThemeContext);
   const router = useRouter();
   const {
     user,
@@ -235,18 +237,24 @@ const CreateTask = () => {
 
   const formattedDate = date ? date.toDateString() : "Select date";
   return (
-    <SafeAreaView className="flex-1 bg-white">
+    <SafeAreaView className={`flex-1 ${isDark ? "bg-gray-800" : "bg-white"}`}>
       <View className="p-5">
         <View>
-          <Text className="text-xl text-secondary font-bold">
+          <Text
+            className={`text-xl ${isDark ? "text-white" : "text-secondary"} font-bold`}
+          >
             Add a new task to your workflow
           </Text>
         </View>
 
         <View className="mt-3">
-          <Text className="text-lg text-secondary">Task Title</Text>
+          <Text
+            className={`text-lg ${isDark ? "text-white" : "text-secondary"}`}
+          >
+            Task Title
+          </Text>
           <TextInput
-            className="bg-slate-200 border border-black rounded-lg p-5 py-3"
+            className={`border ${isDark ? "border-gray-600 text-white bg-gray-800 placeholder:text-surface" : "text-black border-gray-300 bg-gray-100 placeholder:text-black"} rounded-lg p-5 py-3`}
             placeholder="Enter task title"
             value={title}
             onChangeText={setTitle}
@@ -254,11 +262,15 @@ const CreateTask = () => {
         </View>
 
         <View className="mt-3">
-          <Text className="text-lg text-secondary">Description</Text>
+          <Text
+            className={`text-lg ${isDark ? "text-white" : "text-secondary"}`}
+          >
+            Description
+          </Text>
           <TextInput
             multiline={true}
             numberOfLines={4}
-            className="bg-slate-200 border border-black rounded-lg p-5 py-3"
+            className={`border ${isDark ? "border-gray-600 text-white bg-gray-800 placeholder:text-surface" : "text-black border-gray-300 bg-gray-100 placeholder:text-black"} rounded-lg p-5 py-3`}
             placeholder="Describe the task"
             style={{ textAlignVertical: "top" }}
             value={description}
@@ -267,11 +279,21 @@ const CreateTask = () => {
         </View>
 
         <View className="mt-3">
-          <Text className="text-lg text-secondary">Priority</Text>
-          <View className="border border-gray-300 rounded-lg bg-slate-200">
+          <Text
+            className={`text-lg ${isDark ? "text-white" : "text-secondary"}`}
+          >
+            Priority
+          </Text>
+          <View
+            className={`border ${isDark ? "border-gray-600 text-white bg-gray-800 placeholder:text-surface" : "text-black border-gray-300 bg-gray-100 placeholder:text-black"} rounded-lg`}
+          >
             <Picker
               selectedValue={priority}
               onValueChange={(itemValue) => setPriority(itemValue)}
+              dropdownIconColor={isDark ? "#fff" : "#000"}
+              style={{
+                color: isDark ? "#fff" : "#000",
+              }}
             >
               <Picker.Item label="Low" value="Low" />
               <Picker.Item label="Medium" value="Medium" />
@@ -281,14 +303,22 @@ const CreateTask = () => {
         </View>
 
         <View className="mt-3">
-          <Text className="text-lg text-secondary">
+          <Text
+            className={`text-lg ${isDark ? "text-white" : "text-secondary"}`}
+          >
             Assign To {profile?.role === "member" && "(Self only)"}
           </Text>
-          <View className="border border-gray-300 rounded-lg bg-slate-200">
+          <View
+            className={`border ${isDark ? "border-gray-600 text-white bg-gray-800 placeholder:text-surface" : "text-black border-gray-300 bg-gray-100 placeholder:text-black"} rounded-lg`}
+          >
             <Picker
               selectedValue={assignTo}
               onValueChange={(itemValue) => setAssignTo(itemValue)}
               enabled={profile?.role !== "member" || assignableUsers.length > 1}
+              dropdownIconColor={isDark ? "#FFFFFF" : "#000000"}
+              style={{
+                color: isDark ? "#fff" : "#000",
+              }}
             >
               <Picker.Item label="Select team member" value="" />
               {assignableUsers &&
@@ -304,17 +334,21 @@ const CreateTask = () => {
         </View>
 
         <View className="mt-3">
-          <Text className="text-lg text-secondary">Deadline (Optional)</Text>
+          <Text
+            className={`text-lg ${isDark ? "text-white" : "text-secondary"}`}
+          >
+            Deadline (Optional)
+          </Text>
           <TouchableOpacity
             onPress={() => setShow(true)}
             style={{
               borderWidth: 1,
-              borderColor: "#ccc",
+              borderColor: isDark ? "#fff" : "#ccc",
               padding: 15,
               borderRadius: 10,
             }}
           >
-            <Text style={{ color: date ? "#000" : "#999" }}>
+            <Text style={{ color: isDark ? "#fff" : "#999" }}>
               {formattedDate}
             </Text>
           </TouchableOpacity>

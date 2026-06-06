@@ -1,6 +1,8 @@
 import NotificationBell from "@/components/NotificationBell";
+import { ThemeContext } from "@/context/ThemeContext";
 import { UserContext } from "@/context/UserContext";
 import { supabase } from "@/lib/supabase";
+import { showToast } from "@/utils/toast";
 import Ionicons from "@expo/vector-icons/build/Ionicons";
 import { Picker } from "@react-native-picker/picker";
 import { useFocusEffect, useRouter } from "expo-router";
@@ -8,7 +10,6 @@ import { useCallback, useContext, useState } from "react";
 import {
   Alert,
   Modal,
-  Platform,
   ScrollView,
   Text,
   TextInput,
@@ -31,13 +32,13 @@ interface Task {
   children?: Task[];
 }
 
-const showToast = (message: string) => {
-  if (Platform.OS === "android") {
-    ToastAndroid.show(message, ToastAndroid.SHORT);
-  } else {
-    Alert.alert("", message);
-  }
-};
+// const showToast = (message: string) => {
+//   if (Platform.OS === "android") {
+//     ToastAndroid.show(message, ToastAndroid.SHORT);
+//   } else {
+//     Alert.alert("", message);
+//   }
+// };
 
 const Tasks = () => {
   const [activeIndex, setActiveIndex] = useState(0);
@@ -58,7 +59,7 @@ const Tasks = () => {
   const buttons = ["All Tasks", "Pending", "In Progress", "Completed"];
   const router = useRouter();
   const { profile, isAdmin, isLead, user } = useContext(UserContext);
-
+  const { isDark } = useContext(ThemeContext);
   if (!user) {
     return (
       <SafeAreaView>
@@ -146,14 +147,14 @@ const Tasks = () => {
               .eq("id", taskId);
 
             if (error) {
-              showToast(error.message);
+              showToast(error.message, "error");
               return;
             }
 
-            showToast("Task deleted");
+            showToast("Task deleted", "success");
             setTasks(tasks.filter((t) => t.id !== taskId));
           } catch (err) {
-            showToast("Failed to delete task");
+            showToast("Failed to delete task", "error");
           }
         },
       },
@@ -174,7 +175,7 @@ const Tasks = () => {
     if (!editingTask) return;
 
     if (!editTitle.trim()) {
-      showToast("Please enter task title");
+      showToast("Please enter task title", "error");
       return;
     }
 
@@ -318,7 +319,7 @@ const Tasks = () => {
     return (
       <View key={task.id}>
         <View
-          className="bg-gray-50 p-4 rounded-xl mb-3 border border-gray-200"
+          className={`${isDark ? "bg-gray-800" : "bg-white"} p-4 rounded-xl mb-3 border border-gray-200`}
           style={{ marginLeft: level * 16 }}
         >
           <View className="flex-row justify-between items-start">
@@ -331,14 +332,20 @@ const Tasks = () => {
                   <Ionicons
                     name={isExpanded ? "chevron-down" : "chevron-forward"}
                     size={20}
-                    color="#6B7280"
+                    color={isDark ? "#9CA3AF" : "#6B7280"}
                   />
                 </TouchableOpacity>
               )}
               <View className="flex-1">
-                <Text className="text-base font-semibold">{task.title}</Text>
+                <Text
+                  className={`text-base font-semibold ${isDark ? "text-white" : "text-gray-900"}`}
+                >
+                  {task.title}
+                </Text>
                 {task.description && (
-                  <Text className="text-gray-600 mt-1 text-sm">
+                  <Text
+                    className={`mt-1 text-sm ${isDark ? "text-gray-400" : "text-gray-600"}`}
+                  >
                     {task.description}
                   </Text>
                 )}
@@ -347,12 +354,16 @@ const Tasks = () => {
                   {renderStatusBadge(task.status)}
                 </View>
                 {task.assigned_to && (
-                  <Text className="text-gray-500 text-xs mt-1">
+                  <Text
+                    className={`text-gray-500 text-xs mt-1 ${isDark ? "text-gray-400" : "text-gray-600"}`}
+                  >
                     Assigned to: {task.assigned_to}
                   </Text>
                 )}
                 {task.deadline && (
-                  <Text className="text-orange-600 text-xs mt-1">
+                  <Text
+                    className={`text-orange-600 text-xs mt-1 ${isDark ? "text-orange-400" : "text-orange-600"}`}
+                  >
                     Deadline: {new Date(task.deadline).toLocaleDateString()}
                   </Text>
                 )}
@@ -363,13 +374,21 @@ const Tasks = () => {
                 onPress={() => openEditModal(task)}
                 className="p-2"
               >
-                <Ionicons name="create-outline" size={20} color="#6B7280" />
+                <Ionicons
+                  name="create-outline"
+                  size={20}
+                  color={isDark ? "#9CA3AF" : "#6B7280"}
+                />
               </TouchableOpacity>
               <TouchableOpacity
                 onPress={() => deleteTask(task.id)}
                 className="p-2"
               >
-                <Ionicons name="trash-outline" size={20} color="#EF4444" />
+                <Ionicons
+                  name="trash-outline"
+                  size={20}
+                  color={isDark ? "#EF4444" : "#EF4444"}
+                />
               </TouchableOpacity>
             </View>
           </View>
@@ -386,14 +405,20 @@ const Tasks = () => {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-white">
+    <SafeAreaView
+      className={`flex-1 ${isDark ? "bg-gray-900" : "bg-gray-100"}`}
+    >
       <ScrollView className="p-5 flex-1">
         <View className="flex-row justify-between items-center mb-4">
-          <Text className="text-2xl font-semibold">Tasks</Text>
+          <Text
+            className={`text-2xl font-semibold ${isDark ? "text-white" : "text-gray-900"}`}
+          >
+            Tasks
+          </Text>
           <View className="flex-row items-center">
             <NotificationBell />
             <TouchableOpacity
-              className="flex-row gap-2 bg-gray-100 px-3 py-2 rounded-lg ml-3 items-center"
+              className={`flex-row gap-2 ${isDark ? "bg-gray-600" : "bg-gray-200"} px-3 py-2 rounded-lg ml-3 items-center`}
               onPress={() => setViewMode(viewMode === "list" ? "tree" : "list")}
             >
               <Ionicons
@@ -401,11 +426,11 @@ const Tasks = () => {
                   viewMode === "list" ? "list-outline" : "git-network-outline"
                 }
                 size={20}
-                color="#6B7280"
+                color={isDark ? "#9CA3AF" : "#6B7280"}
               />
             </TouchableOpacity>
             <TouchableOpacity
-              className="flex-row gap-2 bg-primary px-4 py-2 rounded-lg ml-2 items-center"
+              className={`flex-row gap-2 ${isDark ? "bg-primary" : "bg-blue-500"} px-4 py-2 rounded-lg ml-2 items-center`}
               onPress={() => router.push("/createtask")}
             >
               <Ionicons name="add" size={20} color="white" />
@@ -415,11 +440,15 @@ const Tasks = () => {
         </View>
 
         <View className="flex-row items-center border border-gray-200 bg-gray-100 px-3 rounded-lg mb-4">
-          <Ionicons name="search" size={20} color="#6B7280" />
+          <Ionicons
+            name="search"
+            size={20}
+            color={isDark ? "#9CA3AF" : "#6B7280"}
+          />
           <TextInput
             className="flex-1 ml-2 text-base bg-transparent border-0 outline-none"
             placeholder="Search tasks..."
-            placeholderTextColor="#9CA3AF"
+            placeholderTextColor={isDark ? "#9CA3AF" : "#6B7280"}
             value={searchQuery}
             onChangeText={setSearchQuery}
           />
@@ -428,7 +457,11 @@ const Tasks = () => {
               onPress={() => setSearchQuery("")}
               className="p-1"
             >
-              <Ionicons name="close-circle" size={18} color="#9CA3AF" />
+              <Ionicons
+                name="close-circle"
+                size={18}
+                color={isDark ? "#9CA3AF" : "#6B7280"}
+              />
             </TouchableOpacity>
           )}
         </View>
@@ -512,7 +545,7 @@ const Tasks = () => {
                       <Ionicons
                         name="create-outline"
                         size={20}
-                        color="#6B7280"
+                        color={isDark ? "#9CA3AF" : "#6B7280"}
                       />
                     </TouchableOpacity>
                     <TouchableOpacity
@@ -522,7 +555,7 @@ const Tasks = () => {
                       <Ionicons
                         name="trash-outline"
                         size={20}
-                        color="#EF4444"
+                        color={isDark ? "#EF4444" : "#EF4444"}
                       />
                     </TouchableOpacity>
                   </View>
@@ -541,29 +574,43 @@ const Tasks = () => {
         onRequestClose={() => setEditModalVisible(false)}
       >
         <View className="flex-1 bg-black/50 justify-end">
-          <View className="bg-white rounded-t-3xl p-5">
+          <View
+            className={`${isDark ? "bg-gray-800" : "bg-white"} rounded-t-3xl p-5`}
+          >
             <View className="flex-row justify-between items-center mb-4">
-              <Text className="text-lg font-bold">Edit Task</Text>
+              <Text
+                className={`text-lg font-bold ${isDark ? "text-white" : "text-gray-800"}`}
+              >
+                Edit Task
+              </Text>
               <TouchableOpacity onPress={() => setEditModalVisible(false)}>
-                <Ionicons name="close" size={24} color="#6B7280" />
+                <Ionicons
+                  name="close"
+                  size={24}
+                  color={isDark ? "#9CA3AF" : "#6B7280"}
+                />
               </TouchableOpacity>
             </View>
 
-            <Text className="text-sm font-semibold text-gray-700 mb-1">
+            <Text
+              className={`text-sm font-semibold ${isDark ? "text-gray-300" : "text-gray-700"} mb-1`}
+            >
               Title
             </Text>
             <TextInput
-              className="border border-gray-300 rounded-lg p-3 mb-3 text-base"
+              className={`border ${isDark ? "border-gray-600 text-white" : "text-black border-gray-300"} rounded-lg p-3 mb-3 text-base`}
               value={editTitle}
               onChangeText={setEditTitle}
               placeholder="Task title"
             />
 
-            <Text className="text-sm font-semibold text-gray-700 mb-1">
+            <Text
+              className={`text-sm font-semibold ${isDark ? "text-gray-300" : "text-gray-700"} mb-1`}
+            >
               Description
             </Text>
             <TextInput
-              className="border border-gray-300 rounded-lg p-3 mb-3 text-base"
+              className={`border ${isDark ? "border-gray-600 text-white" : "text-black border-gray-300"} rounded-lg p-3 mb-3 text-base`}
               value={editDescription}
               onChangeText={setEditDescription}
               placeholder="Task description"
@@ -571,13 +618,22 @@ const Tasks = () => {
               numberOfLines={3}
             />
 
-            <Text className="text-sm font-semibold text-gray-700 mb-1">
+            <Text
+              className={`text-sm font-semibold ${isDark ? "text-gray-300" : "text-gray-700"} mb-1`}
+            >
               Priority
             </Text>
-            <View className="border border-gray-300 rounded-lg mb-3">
+            <View
+              className={`border ${isDark ? "border-gray-600 text-white bg-gray-800" : "text-black border-gray-300 bg-gray-100"} rounded-lg mb-3`}
+            >
               <Picker
                 selectedValue={editPriority}
                 onValueChange={(itemValue) => setEditPriority(itemValue)}
+                style={{
+                  color: isDark ? "#FFFFFF" : "#000000",
+                  height: 50, // 👈 IMPORTANT
+                }}
+                dropdownIconColor={isDark ? "#FFFFFF" : "#000000"}
               >
                 <Picker.Item label="Low" value="Low" />
                 <Picker.Item label="Medium" value="Medium" />
@@ -585,13 +641,24 @@ const Tasks = () => {
               </Picker>
             </View>
 
-            <Text className="text-sm font-semibold text-gray-700 mb-1">
+            <Text
+              className={`text-sm font-semibold ${isDark ? "text-gray-300" : "text-gray-700"} mb-1`}
+            >
               Status
             </Text>
-            <View className="border border-gray-300 rounded-lg mb-3">
+            <View
+              className={`border ${isDark ? "border-gray-600 text-white bg-gray-800" : "text-black border-gray-300 bg-gray-100"} rounded-lg mb-3`}
+              style={{
+                backgroundColor: isDark ? "#1F2937" : "#FFFFFF",
+              }}
+            >
               <Picker
                 selectedValue={editStatus}
                 onValueChange={(itemValue) => setEditStatus(itemValue)}
+                style={{
+                  color: isDark ? "#FFFFFF" : "#000000",
+                }}
+                dropdownIconColor={isDark ? "#FFFFFF" : "#000000"}
               >
                 <Picker.Item label="Pending" value="pending" />
                 <Picker.Item label="In Progress" value="in_progress" />
@@ -599,11 +666,13 @@ const Tasks = () => {
               </Picker>
             </View>
 
-            <Text className="text-sm font-semibold text-gray-700 mb-1">
+            <Text
+              className={`text-sm font-semibold ${isDark ? "text-gray-300" : "text-gray-700"} mb-1`}
+            >
               Deadline
             </Text>
             <TextInput
-              className="border border-gray-300 rounded-lg p-3 mb-4 text-base"
+              className={`border ${isDark ? "border-gray-600 text-white" : "border-gray-300 text-black"} rounded-lg p-3 mb-4 text-base`}
               value={editDeadline}
               onChangeText={setEditDeadline}
               placeholder="YYYY-MM-DD"
@@ -613,7 +682,9 @@ const Tasks = () => {
               className="bg-primary p-4 rounded-xl"
               onPress={updateTask}
             >
-              <Text className="text-white text-center font-semibold text-base">
+              <Text
+                className={`text-white text-center font-semibold text-base ${isDark ? "text-white" : "text-black"}`}
+              >
                 Update Task
               </Text>
             </TouchableOpacity>

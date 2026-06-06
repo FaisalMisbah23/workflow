@@ -1,4 +1,5 @@
 import { NotificationContext } from "@/context/NotificationContext";
+import { ThemeContext } from "@/context/ThemeContext";
 import { UserContext } from "@/context/UserContext";
 import Ionicons from "@expo/vector-icons/build/Ionicons";
 import { useFocusEffect } from "expo-router";
@@ -38,7 +39,7 @@ const Notifications = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [refreshing, setRefreshing] = useState(false);
   const { user } = useContext(UserContext);
-
+  const { isDark } = useContext(ThemeContext);
   if (!user) {
     return (
       <SafeAreaView>
@@ -151,11 +152,19 @@ const Notifications = () => {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-white p-6">
+    <SafeAreaView
+      className={`flex-1 ${isDark ? "bg-gray-900" : "bg-white"} p-6`}
+    >
       {/* Header */}
-      <View className="border-b border-gray-200">
+      <View
+        className={`border-b ${isDark ? "border-gray-600" : "border-gray-200"}`}
+      >
         <View className="flex-row justify-between items-center mb-4">
-          <Text className="text-2xl font-bold">Notifications</Text>
+          <Text
+            className={`text-2xl font-bold ${isDark ? "text-white" : "text-black"}`}
+          >
+            Notifications
+          </Text>
           {unreadCount > 0 && (
             <TouchableOpacity
               onPress={markAllAsRead}
@@ -169,10 +178,16 @@ const Notifications = () => {
         </View>
 
         {/* Search */}
-        <View className="flex-row items-center bg-gray-100 rounded-lg px-4 py-3 mb-3">
-          <Ionicons name="search" size={20} color="#9CA3AF" />
+        <View
+          className={`flex-row items-center  ${isDark ? "bg-gray-600" : "bg-gray-100"} rounded-lg px-4 py-2 mb-3`}
+        >
+          <Ionicons
+            name="search"
+            size={20}
+            color={isDark ? "#9CA3AF" : "#6B7280"}
+          />
           <TextInput
-            className="flex-1 ml-2 text-base bg-transparent border-0 outline-none"
+            className={`flex-1 ml-2 text-base bg-transparent border-0 outline-none ${isDark ? "text-white placeholder:text-white" : "text-gray-900 placeholder:text-gray-500"}`}
             placeholder="Search notifications..."
             value={searchQuery}
             onChangeText={setSearchQuery}
@@ -182,7 +197,11 @@ const Notifications = () => {
               onPress={() => setSearchQuery("")}
               className="p-1"
             >
-              <Ionicons name="close-circle" size={18} color="#9CA3AF" />
+              <Ionicons
+                name="close-circle"
+                size={18}
+                color={isDark ? "#9CA3AF" : "#6B7280"}
+              />
             </TouchableOpacity>
           )}
         </View>
@@ -234,14 +253,14 @@ const Notifications = () => {
             </Text>
           </View>
         ) : (
-          <View className="p-4">
+          <View className="mt-4">
             {filteredNotifications.map((notification: Notification) => (
               <TouchableOpacity
                 key={notification.id}
                 onPress={() =>
                   !notification.read && markAsRead(notification.id)
                 }
-                className={`p-4 rounded-xl mb-3 ${notification.read ? "bg-gray-50" : "bg-blue-50 border-l-4 border-blue-500"}`}
+                className={`p-4 rounded-xl mb-3 ${notification.read ? (isDark ? "bg-gray-700" : "bg-gray-50") : "bg-gray-200 border-l-4 border-blue-500"}`}
               >
                 <View className="flex-row items-start">
                   {/* Icon */}
@@ -260,10 +279,10 @@ const Notifications = () => {
                   </View>
 
                   {/* Content */}
-                  <View className="flex-1">
+                  <View className="flex-1 ">
                     <View className="flex-row justify-between items-start">
                       <Text
-                        className={`font-semibold text-base ${notification.read ? "text-gray-700" : "text-gray-900"}`}
+                        className={`font-semibold text-base ${notification.read ? (isDark ? "text-gray-300" : "text-gray-700") : isDark ? "text-white" : "text-gray-900"}`}
                       >
                         {notification.title}
                       </Text>
@@ -271,10 +290,14 @@ const Notifications = () => {
                         <View className="w-2 h-2 bg-blue-500 rounded-full ml-2 mt-2" />
                       )}
                     </View>
-                    <Text className="text-gray-600 text-sm mt-1">
+                    <Text
+                      className={`text-sm mt-1 ${notification.read ? (isDark ? "text-gray-400" : "text-gray-600") : isDark ? "text-gray-300" : "text-gray-900"}`}
+                    >
                       {notification.message}
                     </Text>
-                    <Text className="text-gray-400 text-xs mt-2">
+                    <Text
+                      className={`text-gray-400 text-xs mt-2 ${isDark ? "text-gray-400" : "text-gray-500"}`}
+                    >
                       {notification.created_at &&
                         formatTimeAgo(notification.created_at)}
                     </Text>

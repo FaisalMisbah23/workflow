@@ -1,3 +1,4 @@
+import { ThemeContext } from "@/context/ThemeContext";
 import { UserContext } from "@/context/UserContext";
 import { supabase } from "@/lib/supabase";
 import { useRouter } from "expo-router";
@@ -26,6 +27,7 @@ const info = () => {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   const { user } = useContext(UserContext);
+  const { isDark } = useContext(ThemeContext);
 
   const handleNext = async () => {
     setLoading(true);
@@ -61,14 +63,14 @@ const info = () => {
   };
 
   return (
-    <View className="absolute top-[220px] w-full">
-      <View className="p-5">
+    <View className="relative flex-1  h-full w-full dark:bg-gray-900">
+      <View className="p-5 mt-auto mb-auto">
         <View className="gap-3 mb-4">
-          <Text className="text-xl">Full Name</Text>
+          <Text className="text-xl dark:text-white">Full Name</Text>
           <TextInput
             value={fullname}
             onChangeText={(text) => setFullName(text)}
-            className="bg-surface border border-secondary rounded-lg shadow-sm p-4"
+            className={`dark:text-white dark:placeholder:text-gray-200 border border-secondary dark:border-white rounded-lg shadow-sm p-4`}
             placeholder="John Doe"
           />
         </View>

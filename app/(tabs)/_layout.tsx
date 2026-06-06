@@ -1,11 +1,14 @@
+import { ThemeContext } from "@/context/ThemeContext";
 import { UserContext } from "@/context/UserContext";
 import { supabase } from "@/lib/supabase";
 import Ionicons from "@expo/vector-icons/build/Ionicons";
 import { Tabs, useFocusEffect, useRouter } from "expo-router";
 import React, { useContext, useEffect } from "react";
-
 const _layout = () => {
-  const { isLoggedIn, loading, user, profile, setProfile, setOrg } = useContext(UserContext) as any;
+  const { isLoggedIn, loading, user, profile, setProfile, setOrg } = useContext(
+    UserContext,
+  ) as any;
+  const { isDark } = useContext(ThemeContext) as any;
   const router = useRouter();
 
   useEffect(() => {
@@ -36,7 +39,7 @@ const _layout = () => {
       };
 
       verifyOrganizationAccess();
-    }, [isLoggedIn, user?.user?.id, profile?.org_id])
+    }, [isLoggedIn, user?.user?.id, profile?.org_id]),
   );
 
   if (loading) {
@@ -47,11 +50,19 @@ const _layout = () => {
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: "#000",
-        tabBarInactiveTintColor: "#cdcde0",
+        tabBarActiveTintColor: isDark ? "#fff" : "#000",
+        tabBarInactiveTintColor: isDark ? "#9CA3AF" : "#cdcde0",
+        sceneStyle: {
+          backgroundColor: isDark ? "#111827" : "#FFFFFF",
+        },
         tabBarStyle: {
-          height: 60,
+          height: 65,
           paddingTop: 5,
+          borderRadius: 15,
+          backgroundColor: isDark ? "#1F2937" : "#FFFFFF",
+          shadowOffset: { width: 0, height: -2 },
+          shadowOpacity: 0.1,
+          shadowRadius: 4,
         },
         tabBarLabelStyle: {
           fontSize: 10,

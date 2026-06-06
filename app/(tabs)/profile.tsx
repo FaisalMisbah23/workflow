@@ -1,4 +1,5 @@
 import Settings from "@/components/Settings";
+import { ThemeContext } from "@/context/ThemeContext";
 import { UserContext } from "@/context/UserContext";
 import { supabase } from "@/lib/supabase";
 import Ionicons from "@expo/vector-icons/build/Ionicons";
@@ -35,8 +36,8 @@ const Profile = () => {
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [changingPassword, setChangingPassword] = useState(false);
-
-  if (!profile) {
+  const { isDark } = useContext(ThemeContext) as any;
+  if (!profile || !user) {
     return (
       <SafeAreaView>
         <Bounce
@@ -277,16 +278,20 @@ const Profile = () => {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-gray-50">
+    <SafeAreaView
+      className={`flex-1 ${isDark ? "bg-gray-900" : "bg-gray-100"}`}
+    >
       <ScrollView className="flex-1">
         <View className="p-5">
           {/* Profile Header Card */}
-          <View className="bg-white rounded-2xl shadow-sm overflow-hidden mb-6 p-3">
+          <View
+            className={`${isDark ? "bg-gray-800" : "bg-white"} rounded-2xl shadow-sm overflow-hidden mb-6  flex items-center`}
+          >
             {/* Banner */}
-            <View className="bg-gradient-to-r from-primary to-primary/80 h-28" />
+            <View className="bg-gradient-to-r from-primary to-primary/80 h-20" />
 
             {/* Profile Info */}
-            <View className="px-5 pb-5 mt-16">
+            <View className="px-4 relative bottom-14 w-full">
               <View className="flex-row items-end">
                 {/* Avatar */}
                 <View className="relative">
@@ -372,16 +377,29 @@ const Profile = () => {
                     </View>
                   ) : (
                     <View>
-                      <Text className="text-gray-900 text-lg font-semibold">
+                      <Text
+                        className={`${isDark ? "text-white" : "text-gray-900"} text-lg font-semibold`}
+                      >
                         {profile?.fullname}
                       </Text>
                       {profile?.username ? (
-                        <Text className="text-gray-500 text-sm">
+                        <Text
+                          className={`${isDark ? "text-gray-400" : "text-gray-500"} text-sm`}
+                        >
                           @{profile.username}
                         </Text>
                       ) : null}
+                      {profile?.email ? (
+                        <Text
+                          className={`${isDark ? "text-gray-400" : "text-gray-500"} text-sm`}
+                        >
+                          @{profile.email}
+                        </Text>
+                      ) : null}
                       {profile?.bio && (
-                        <Text className="text-gray-600 text-sm mt-1 line-clamp-2">
+                        <Text
+                          className={`${isDark ? "text-gray-400" : "text-gray-600"} text-sm mt-1 line-clamp-2`}
+                        >
                           {profile?.bio}
                         </Text>
                       )}
@@ -395,17 +413,19 @@ const Profile = () => {
                 <View className="mt-4 flex-row gap-2">
                   <TouchableOpacity
                     onPress={() => setIsEditing(true)}
-                    className="flex-1 bg-primary py-2.5 rounded-lg"
+                    className={`${isDark ? "bg-blue-600" : "bg-primary"} flex items-center justify-center w-1/3 rounded-lg`}
                   >
-                    <Text className="text-white text-center font-medium text-sm">
+                    <Text className="text-white text-center font-medium text-md">
                       Edit Profile
                     </Text>
                   </TouchableOpacity>
                   <TouchableOpacity
                     onPress={() => setShowChangePassword(true)}
-                    className="flex-1 bg-gray-200 py-2.5 rounded-lg"
+                    className={`${isDark ? "bg-gray-600" : "bg-gray-200"} flex items-center justify-center w-[120px] rounded-lg`}
                   >
-                    <Text className="text-gray-700 text-center font-medium text-sm">
+                    <Text
+                      className={`${isDark ? "text-gray-300" : "text-gray-700"} text-center font-medium text-md`}
+                    >
                       Change Password
                     </Text>
                   </TouchableOpacity>
@@ -425,26 +445,48 @@ const Profile = () => {
           </View>
 
           {/* Stats Card */}
-          <View className="bg-white rounded-2xl shadow-sm p-5 mb-6">
-            <Text className="text-lg font-semibold text-gray-900 mb-4">
+          <View
+            className={`${isDark ? "bg-gray-800" : "bg-white"} rounded-2xl shadow-sm p-5 mb-6`}
+          >
+            <Text
+              className={`${isDark ? "text-white" : "text-gray-900"} text-lg font-semibold mb-4`}
+            >
               Profile Details
             </Text>
             <View className="space-y-3">
               <View className="flex-row justify-between items-center py-2 border-b border-gray-100">
-                <Text className="text-gray-500 text-sm">Role</Text>
-                <Text className="text-gray-900 font-medium capitalize">
+                <Text
+                  className={`${isDark ? "text-gray-400" : "text-gray-500"} text-sm`}
+                >
+                  Role
+                </Text>
+                <Text
+                  className={`${isDark ? "text-white" : "text-gray-900"} font-medium capitalize`}
+                >
                   {profile?.role ?? "Member"}
                 </Text>
               </View>
               <View className="flex-row justify-between items-center py-2 border-b border-gray-100">
-                <Text className="text-gray-500 text-sm">Organization</Text>
-                <Text className="text-gray-900 font-medium">
+                <Text
+                  className={`${isDark ? "text-gray-400" : "text-gray-500"} text-sm`}
+                >
+                  Organization
+                </Text>
+                <Text
+                  className={`${isDark ? "text-white" : "text-gray-900"} font-medium`}
+                >
                   {Org[0]?.name || "None"}
                 </Text>
               </View>
               <View className="flex-row justify-between items-center py-2">
-                <Text className="text-gray-500 text-sm">Joined</Text>
-                <Text className="text-gray-900 font-medium">
+                <Text
+                  className={`${isDark ? "text-gray-400" : "text-gray-500"} text-sm`}
+                >
+                  Joined
+                </Text>
+                <Text
+                  className={`${isDark ? "text-white" : "text-gray-900"} font-medium`}
+                >
                   {user?.user?.created_at?.slice(0, 10)}
                 </Text>
               </View>

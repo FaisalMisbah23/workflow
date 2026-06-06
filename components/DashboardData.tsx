@@ -12,7 +12,7 @@ interface UpcomingDeadline {
   deadline: string;
 }
 
-const DashboardData = () => {
+const DashboardData = ({ isDark }: { isDark: boolean }) => {
   const { user, teamMembers } = useContext(UserContext) as any;
   const [activeTasks, setActiveTasks] = useState<number>(0);
   const [overdueTasks, setOverdueTasks] = useState<number>(0);
@@ -89,7 +89,9 @@ const DashboardData = () => {
   return (
     <View className="px-5">
       <View className="flex-row flex-wrap justify-between gap-y-3">
-        <View className="flex-row justify-between w-[48%] rounded-3xl border border-blue-100 bg-blue-50 p-4">
+        <View
+          className={`flex-row justify-between w-[48%] rounded-3xl border ${isDark ? "border-white" : "border-gray-200"} ${isDark ? "bg-gray-400" : "bg-blue-50"} p-4`}
+        >
           <View className="flex-1 gap-2">
             <Text className="text-sm font-medium text-blue-700">
               Active Tasks
@@ -106,7 +108,9 @@ const DashboardData = () => {
             />
           </View>
         </View>
-        <View className="flex-row justify-between w-[48%] rounded-3xl border border-rose-100 bg-rose-50 p-4">
+        <View
+          className={`flex-row justify-between w-[48%] rounded-3xl border ${isDark ? "border-white" : "border-rose-200"} ${isDark ? "bg-gray-400" : "bg-rose-50"} p-4`}
+        >
           <View className="flex-1 gap-2">
             <Text className="text-sm font-medium text-rose-700">Overdue</Text>
             <Text className="text-2xl font-bold text-rose-950">
@@ -117,9 +121,13 @@ const DashboardData = () => {
             <Ionicons name="alert-circle-outline" size={24} color="#E11D48" />
           </View>
         </View>
-        <View className="flex-row justify-between w-[48%] rounded-3xl border border-violet-100 bg-violet-50 p-4">
+        <View
+          className={`flex-row justify-between w-[48%] rounded-3xl border ${isDark ? "border-white" : "border-gray-200"} ${isDark ? "bg-gray-400" : "bg-violet-50"} p-4`}
+        >
           <View className="flex-1 gap-2">
-            <Text className="text-sm font-medium text-violet-700">
+            <Text
+              className={`text-sm font-medium ${isDark ? "text-yellow-600" : "text-violet-700"}`}
+            >
               Team Members
             </Text>
             <Text className="text-2xl font-bold text-violet-950">
@@ -130,7 +138,9 @@ const DashboardData = () => {
             <Ionicons name="people-outline" size={24} color="#7C3AED" />
           </View>
         </View>
-        <View className="flex-row justify-between w-[48%] rounded-3xl border border-emerald-100 bg-emerald-50 p-4">
+        <View
+          className={`flex-row justify-between w-[48%] rounded-3xl border ${isDark ? "border-white" : "border-emerald-200"} ${isDark ? "bg-gray-400" : "bg-emerald-50"} p-4`}
+        >
           <View className="flex-1 gap-2">
             <Text className="text-sm font-medium text-emerald-700">
               Completed
@@ -145,18 +155,30 @@ const DashboardData = () => {
         </View>
       </View>
 
-      <View className="mt-5 rounded-3xl border border-gray-200 bg-white p-4 shadow-sm shadow-black/5">
+      <View
+        className={`mt-5 rounded-3xl border ${isDark ? "border-white" : "border-gray-200"} ${isDark ? "bg-gray-400" : "bg-white"} p-4 shadow-sm shadow-black/5`}
+      >
         <View className="flex-row justify-between items-center mb-3">
           <View>
-            <Text className="text-lg font-bold text-gray-900">
+            <Text
+              className={`text-lg font-bold text-gray-900 ${isDark ? "text-gray-100" : "text-gray-900"}`}
+            >
               Upcoming Deadlines
             </Text>
-            <Text className="text-sm text-gray-500">
+            <Text
+              className={`text-sm ${isDark ? "text-gray-300" : "text-gray-500"}`}
+            >
               The next items needing attention
             </Text>
           </View>
-          <View className="h-10 w-10 items-center justify-center rounded-2xl bg-gray-100">
-            <Ionicons name="calendar-outline" size={22} color="#374151" />
+          <View
+            className={`h-10 w-10 items-center justify-center rounded-lg ${isDark ? "bg-gray-600" : "bg-gray-100"}`}
+          >
+            <Ionicons
+              name="calendar-outline"
+              size={22}
+              color={isDark ? "#D1D5DB" : "#374151"}
+            />
           </View>
         </View>
 
@@ -192,7 +214,7 @@ const DashboardData = () => {
             </View>
           ))
         ) : (
-          <View className="items-center rounded-2xl bg-gray-50 px-4 py-6">
+          <View className="items-center rounded-2xl bg-gray-50 p-4">
             <Ionicons name="sparkles-outline" size={22} color="#6B7280" />
             <Text className="mt-2 text-center text-sm text-gray-500">
               No upcoming deadlines.

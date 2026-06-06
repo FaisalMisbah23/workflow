@@ -1,3 +1,4 @@
+import { ThemeContext } from "@/context/ThemeContext";
 import { UserContext } from "@/context/UserContext";
 import { supabase } from "@/lib/supabase";
 import Ionicons from "@expo/vector-icons/build/Ionicons";
@@ -39,6 +40,7 @@ const Team = () => {
   const [roleOverrides, setRoleOverrides] = useState<Record<string, string>>(
     {},
   );
+  const { isDark } = useContext(ThemeContext);
   const [recentActivity, setRecentActivity] = useState<any[]>([]);
   const orgId = Org?.[0]?.id;
   const visibleTeamMembers = teamMembers
@@ -209,7 +211,11 @@ const Team = () => {
     <SafeAreaView className="flex-1">
       <View className="p-5">
         <View className="flex-row justify-between items-center mb-4">
-          <Text className="text-2xl font-bold">Team</Text>
+          <Text
+            className={`text-2xl font-bold ${isDark ? "text-white" : "text-black"}`}
+          >
+            Team
+          </Text>
           {(isAdmin || isLead) && (
             <TouchableOpacity
               className="flex-row gap-2 bg-primary px-4 py-3 rounded-lg"
@@ -220,7 +226,9 @@ const Team = () => {
             </TouchableOpacity>
           )}
         </View>
-        <Text className="text-gray-600 text-base mb-4">
+        <Text
+          className={`${isDark ? "text-gray-300" : "text-black"} text-base mb-4`}
+        >
           {visibleTeamMembers?.length ?? 0} team members
         </Text>
         <View className="flex flex-row gap-2">
@@ -247,7 +255,11 @@ const Team = () => {
             </View>
           </View>
         </View>
-        <Text className="mt-6 text-lg font-bold">Departments</Text>
+        <Text
+          className={`mt-6 text-lg font-bold ${isDark ? "text-white" : "text-black"}`}
+        >
+          Departments
+        </Text>
         <View className="flex-row gap-2 flex-wrap mt-3">
           {departments.length > 0 ? (
             departments.map((item, index) => (
@@ -265,7 +277,11 @@ const Team = () => {
           )}
         </View>
         <View className="mt-6">
-          <Text className="text-lg font-bold">Team members</Text>
+          <Text
+            className={`text-lg font-bold ${isDark ? "text-white" : "text-black"}`}
+          >
+            Team members
+          </Text>
         </View>
         <ScrollView
           showsVerticalScrollIndicator={false}
@@ -275,7 +291,7 @@ const Team = () => {
             visibleTeamMembers.map((item: any) => (
               <View
                 key={item.id}
-                className="mt-4 border border-gray-200 rounded-xl p-4"
+                className={`mt-4 border border-gray-200 rounded-xl p-4 ${isDark ? "bg-gray-400" : "bg-white"}`}
               >
                 <View className="flex-row w-full">
                   <View className="w-12 h-12 bg-primary rounded-full items-center justify-center">
@@ -288,7 +304,7 @@ const Team = () => {
                       {item.fullname}
                     </Text>
                     <Text className="text-gray-600 text-sm">{item.email}</Text>
-                    <Text className="text-gray-500 text-sm capitalize">
+                    <Text className="text-blue-600 text-sm capitalize">
                       {item.role}
                     </Text>
                     {isAdmin && item.id !== profile?.id && (
@@ -296,12 +312,22 @@ const Team = () => {
                         <Text className="text-xs text-gray-500 mb-1">
                           Change Role
                         </Text>
-                        <View className="border border-gray-300 rounded-lg">
+                        <View className="">
                           <Picker
                             selectedValue={item.role}
                             onValueChange={(value) =>
                               handleChangeRole(item.id, value)
                             }
+                            style={{
+                              height: 47,
+                              width: "100%",
+                              color: isDark ? "white" : "black",
+                              backgroundColor: isDark ? "#4B5563" : "white",
+                              borderRadius: 10,
+                              borderWidth: 1,
+                              borderColor: isDark ? "#374151" : "#D1D5DB",
+                            }}
+                            dropdownIconColor={isDark ? "white" : "black"}
                           >
                             <Picker.Item label="Admin" value="admin" />
                             <Picker.Item label="Lead" value="lead" />
@@ -317,7 +343,7 @@ const Team = () => {
                       className="p-2"
                     >
                       <Ionicons
-                        name="person-remove-outline"
+                        name="trash-outline"
                         size={24}
                         color="#EF4444"
                       />
@@ -327,7 +353,9 @@ const Team = () => {
               </View>
             ))
           ) : (
-            <View className="mt-6 bg-white border border-gray-200 rounded-2xl p-6 shadow-sm shadow-black/5 items-center">
+            <View
+              className={`mt-6 ${isDark ? "bg-gray-400" : "bg-white"} border border-gray-200 rounded-2xl p-6 shadow-sm shadow-black/5 items-center`}
+            >
               {isAdmin || isLead ? (
                 <View className="items-center w-full">
                   <View className="w-16 h-16 bg-blue-50 rounded-full items-center justify-center mb-4">
@@ -365,7 +393,7 @@ const Team = () => {
                     <Ionicons
                       name="shield-checkmark-outline"
                       size={32}
-                      color="#7C3AED"
+                      color={isDark ? "white" : "#7C3AED"}
                     />
                   </View>
                   <Text className="text-lg font-bold text-gray-900 text-center mb-2">
@@ -429,44 +457,74 @@ const Team = () => {
           className="flex-1 bg-black/50 justify-center items-center px-4"
           onPress={() => setModalVisible(false)}
         >
-          <Pressable className="bg-white w-full rounded-2xl p-5">
+          <Pressable
+            className={`${isDark ? "bg-gray-600" : "bg-white"} w-full rounded-2xl p-5`}
+          >
             <View className="flex-row justify-between items-start mb-4">
               <View>
-                <Text className="text-lg font-bold">Add Team Member</Text>
-                <Text className="text-gray-600 text-sm mt-1">
+                <Text
+                  className={`text-lg font-bold ${isDark ? "text-white" : "text-black"}`}
+                >
+                  Add Team Member
+                </Text>
+                <Text
+                  className={`text-${isDark ? "gray-400" : "gray-600"} text-sm mt-1`}
+                >
                   Invite someone to join organization
                 </Text>
               </View>
               <TouchableOpacity onPress={() => setModalVisible(false)}>
-                <Ionicons name="close" size={24} color="#6B7280" />
+                <Ionicons
+                  name="close"
+                  size={24}
+                  color={isDark ? "white" : "black"}
+                />
               </TouchableOpacity>
             </View>
 
-            <Text className="text-sm font-semibold mb-2">Invite via link</Text>
+            <Text
+              className={`text-sm font-semibold mb-2 ${isDark ? "text-white" : "text-black"}`}
+            >
+              Invite via link
+            </Text>
             <View className="flex-row gap-2 items-center mb-2">
-              <View className="flex-1 bg-gray-100 rounded-lg px-3 py-2">
-                <Text className="text-sm text-gray-700">{Invite_Link}</Text>
+              <View
+                className={`flex-1 ${isDark ? "bg-gray-600" : "bg-gray-100"} rounded-lg px-3 py-2`}
+              >
+                <Text
+                  className={`text-sm ${isDark ? "text-white" : "text-gray-700"}`}
+                >
+                  {Invite_Link}
+                </Text>
               </View>
               <TouchableOpacity
-                className="border border-gray-300 px-4 py-2 rounded-lg"
+                className={`border ${isDark ? "border-gray-500" : "border-gray-300"} px-4 py-2 rounded-lg`}
                 onPress={handleCopy}
               >
-                <Text className="text-sm font-medium">
+                <Text
+                  className={`text-sm font-medium ${isDark ? "text-white" : "text-black"}`}
+                >
                   {copied ? "Copied" : "Copy"}
                 </Text>
               </TouchableOpacity>
             </View>
             {copied && (
-              <Text className="text-xs text-green-600 mb-3">
+              <Text
+                className={`text-xs ${isDark ? "text-green-400" : "text-green-600"} mb-3`}
+              >
                 Link Copied to Clipboard
               </Text>
             )}
 
             {/* Divider */}
-            <View className="border-t border-gray-200 my-4" />
+            <View
+              className={`border-t ${isDark ? "border-gray-500" : "border-gray-200"} my-4`}
+            />
 
             {/* Email Invite */}
-            <Text className="text-sm font-semibold mb-2 text-gray-700">
+            <Text
+              className={`text-sm font-semibold mb-2 ${isDark ? "text-white" : "text-gray-700"}`}
+            >
               Or invite via email
             </Text>
             <TextInput
@@ -475,13 +533,24 @@ const Team = () => {
               placeholder="member@gmail.com"
               keyboardType="email-address"
               autoCapitalize="none"
-              className="border border-gray-300 rounded-lg px-4 py-3 text-sm mb-3"
+              className={`border ${isDark ? "border-gray-500 placeholder:text-gray-400" : "border-gray-300 placeholder:text-black"} rounded-lg px-4 py-3 text-sm mb-3`}
             />
-            <Text className="text-sm font-semibold mb-2 text-gray-700">
+            <Text
+              className={`text-sm font-semibold mb-2 ${isDark ? "text-white" : "text-gray-700"}`}
+            >
               Role
             </Text>
-            <View className="border border-gray-300 rounded-lg mb-4">
-              <Picker selectedValue={inviteRole} onValueChange={setInviteRole}>
+            <View
+              className={`border ${isDark ? "border-gray-500" : "border-gray-300"} rounded-lg mb-4`}
+            >
+              <Picker
+                selectedValue={inviteRole}
+                onValueChange={setInviteRole}
+                dropdownIconColor={isDark ? "white" : "black"}
+                style={{
+                  color: isDark ? "white" : "black",
+                }}
+              >
                 {roleOptions.map((role) => (
                   <Picker.Item
                     key={role}
