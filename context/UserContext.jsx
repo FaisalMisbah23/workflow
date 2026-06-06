@@ -251,11 +251,24 @@ const UserProvider = ({ children }) => {
   };
 
   const logout = async () => {
-    await AsyncStorage.removeItem("user");
-    showToast("Logged out successfully", "success");
-    setUser(null);
-    setIsLoggedIn(false);
-    router.replace("/signin");
+    try {
+      await supabase.auth.signOut();
+      await AsyncStorage.removeItem("user");
+
+      setUser(null);
+      setIsLoggedIn(false);
+      setProfile(null);
+      setOrg(null);
+
+      showToast("Logged out successfully", "success");
+
+      // IMPORTANT: delay navigation
+      setTimeout(() => {
+        router.replace("/signin");
+      }, 50);
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   const uploadImage = async (localUri, userId) => {

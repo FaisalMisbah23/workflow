@@ -206,6 +206,103 @@ const Team = () => {
   };
 
   const roleOptions = isAdmin ? ["admin", "lead", "member"] : ["member"];
+  const admins = visibleTeamMembers.filter((user) => user.role === "admin");
+
+  const leads = visibleTeamMembers.filter((user) => user.role === "lead");
+
+  const members = visibleTeamMembers.filter((user) => user.role === "member");
+  const TeamCard = ({
+    item,
+    isAdmin,
+    profile,
+    onChangeRole,
+    onRemoveMember,
+    roleOverrides,
+  }: any) => (
+    <View
+      className={`w-full rounded-2xl p-4 mb-3 shadow-sm border ${
+        isDark ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"
+      }`}
+      style={{
+        width: "100%",
+        alignSelf: "flex-start",
+      }}
+    >
+      <View className="flex-row items-center">
+        {/* Avatar */}
+        <View className="w-10 h-10 bg-primary rounded-full items-center justify-center">
+          <Text className="text-white font-semibold">
+            {item.fullname?.slice(0, 2).toUpperCase()}
+          </Text>
+        </View>
+
+        {/* Info */}
+        <View className="ml-3 flex-1">
+          <Text
+            numberOfLines={1}
+            className={`font-semibold ${isDark ? "text-white" : "text-black"}`}
+          >
+            {item.fullname}
+          </Text>
+
+          <Text className="text-gray-500 text-[11px]">{item.email}</Text>
+
+          <View className="flex-row items-center mt-1">
+            <View
+              className={`px-2 py-1 rounded-full ${
+                item.role === "lead"
+                  ? "bg-purple-100"
+                  : item.role === "admin"
+                    ? "bg-red-100"
+                    : "bg-green-100"
+              }`}
+            >
+              <Text
+                className={`text-xs font-semibold capitalize ${
+                  item.role === "lead"
+                    ? "text-purple-600"
+                    : item.role === "admin"
+                      ? "text-red-600"
+                      : "text-green-600"
+                }`}
+              >
+                {item.role}
+              </Text>
+            </View>
+          </View>
+
+          {/* ROLE PICKER */}
+          {isAdmin && item.id !== profile?.id && (
+            <View className="mt-3 border rounded-lg overflow-hidden">
+              <Picker
+                selectedValue={roleOverrides?.[item.id] || item.role}
+                onValueChange={(value) => onChangeRole(item.id, value)}
+                style={{
+                  height: 47,
+                  color: isDark ? "white" : "black",
+                }}
+                dropdownIconColor={isDark ? "white" : "black"}
+              >
+                <Picker.Item label="Admin" value="admin" />
+                <Picker.Item label="Lead" value="lead" />
+                <Picker.Item label="Member" value="member" />
+              </Picker>
+            </View>
+          )}
+        </View>
+
+        {/* DELETE BUTTON */}
+        {isAdmin && item.id !== profile?.id && (
+          <TouchableOpacity
+            onPress={() => onRemoveMember(item)}
+            className="p-2"
+          >
+            <Ionicons name="trash-outline" size={20} color="#EF4444" />
+          </TouchableOpacity>
+        )}
+      </View>
+    </View>
+  );
 
   return (
     <SafeAreaView className="flex-1">
@@ -283,144 +380,161 @@ const Team = () => {
             Team members
           </Text>
         </View>
+
         <ScrollView
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{ paddingBottom: 350 }}
         >
-          {visibleTeamMembers && visibleTeamMembers.length > 0 ? (
-            visibleTeamMembers.map((item: any) => (
-              <View
-                key={item.id}
-                className={`mt-4 border border-gray-200 rounded-xl p-4 ${isDark ? "bg-gray-400" : "bg-white"}`}
-              >
-                <View className="flex-row w-full">
-                  <View className="w-12 h-12 bg-primary rounded-full items-center justify-center">
-                    <Text className="text-white text-center font-semibold">
-                      {item.fullname?.slice(0, 2).toUpperCase()}
-                    </Text>
-                  </View>
-                  <View className="ml-4 flex-1">
-                    <Text className="text-lg font-semibold">
-                      {item.fullname}
-                    </Text>
-                    <Text className="text-gray-600 text-sm">{item.email}</Text>
-                    <Text className="text-blue-600 text-sm capitalize">
-                      {item.role}
-                    </Text>
-                    {isAdmin && item.id !== profile?.id && (
-                      <View className="mt-3">
-                        <Text className="text-xs text-gray-500 mb-1">
-                          Change Role
-                        </Text>
-                        <View className="">
-                          <Picker
-                            selectedValue={item.role}
-                            onValueChange={(value) =>
-                              handleChangeRole(item.id, value)
-                            }
-                            style={{
-                              height: 47,
-                              width: "100%",
-                              color: isDark ? "white" : "black",
-                              backgroundColor: isDark ? "#4B5563" : "white",
-                              borderRadius: 10,
-                              borderWidth: 1,
-                              borderColor: isDark ? "#374151" : "#D1D5DB",
-                            }}
-                            dropdownIconColor={isDark ? "white" : "black"}
-                          >
-                            <Picker.Item label="Admin" value="admin" />
-                            <Picker.Item label="Lead" value="lead" />
-                            <Picker.Item label="Member" value="member" />
-                          </Picker>
-                        </View>
+          <View className="relative pl-6">
+            {/* MAIN VERTICAL LINE (ADMIN LEVEL) */}
+            <View className="absolute left-3 top-0 bottom-0 w-[2px] bg-gray-300" />
+
+            {admins.map((admin) => (
+              <View key={admin.id} className="mb-6">
+                {/* ADMIN NODE */}
+                <View className="flex-row items-center">
+                  <View className="w-3 h-3 bg-primary rounded-full absolute left-3" />
+
+                  {/* horizontal line */}
+                  <View className="w-2 h-[2px] bg-gray-300 absolute left-[-10px]" />
+                  <View className="w-2.5 h-2.5 bg-red-600 rounded-full absolute left-[-6px]" />
+
+                  <TeamCard
+                    item={admin}
+                    isAdmin={isAdmin}
+                    profile={profile}
+                    onChangeRole={handleChangeRole}
+                    onRemoveMember={handleRemoveMember}
+                    roleOverrides={roleOverrides}
+                  />
+                </View>
+
+                {/* LEADS */}
+                <View className="ml-6 relative pl-6 mt-3">
+                  {/* CONNECTOR LINE (LEADS ONLY) */}
+
+                  {leads.map((lead) => (
+                    <View key={lead.id} className="mb-4">
+                      {/* LEAD NODE */}
+                      <View className="flex-row items-center">
+                        {/* vertical connector */}
+                        <View className="absolute left-[-24px] top-[-22px] bottom-[75px] w-[2px] bg-gray-300" />
+
+                        {/* horizontal connector */}
+                        <View className="w-28 h-[2px] bg-gray-300 absolute left-[-52px]" />
+                        <View className="w-2.5 h-2.5 bg-purple-500 rounded-full absolute left-[-6px]" />
+                        <TeamCard
+                          item={lead}
+                          isAdmin={isAdmin}
+                          profile={profile}
+                          onChangeRole={handleChangeRole}
+                          onRemoveMember={handleRemoveMember}
+                          roleOverrides={roleOverrides}
+                        />
                       </View>
-                    )}
-                  </View>
-                  {isAdmin && item.id !== profile?.id && (
-                    <TouchableOpacity
-                      onPress={() => handleRemoveMember(item)}
-                      className="p-2"
-                    >
-                      <Ionicons
-                        name="trash-outline"
-                        size={24}
-                        color="#EF4444"
-                      />
-                    </TouchableOpacity>
-                  )}
+
+                      {/* MEMBERS */}
+                      <View className="ml-6 relative pl-6 mt-2">
+                        {members.map((member) => (
+                          <View
+                            key={member.id}
+                            className="flex-row items-center mb-2"
+                          >
+                            {/* vertical connector */}
+                            <View className="absolute left-[-24px] top-[-20px] bottom-[80px] w-[2px] bg-gray-300" />
+
+                            {/* horizontal connector */}
+                            <View className="w-36 h-[2px] bg-gray-300 absolute left-[-95px]" />
+                            <View className="w-2 h-2 bg-green-500 rounded-full absolute left-[-6px]" />
+
+                            <TeamCard
+                              item={member}
+                              isAdmin={isAdmin}
+                              profile={profile}
+                              onChangeRole={handleChangeRole}
+                              onRemoveMember={handleRemoveMember}
+                              roleOverrides={roleOverrides}
+                            />
+                          </View>
+                        ))}
+                      </View>
+                    </View>
+                  ))}
                 </View>
               </View>
-            ))
-          ) : (
-            <View
-              className={`mt-6 ${isDark ? "bg-gray-400" : "bg-white"} border border-gray-200 rounded-2xl p-6 shadow-sm shadow-black/5 items-center`}
-            >
-              {isAdmin || isLead ? (
-                <View className="items-center w-full">
-                  <View className="w-16 h-16 bg-blue-50 rounded-full items-center justify-center mb-4">
-                    <Ionicons name="people-outline" size={32} color="#3B82F6" />
-                  </View>
-                  <Text className="text-lg font-bold text-gray-900 text-center mb-2">
-                    Build Your Dream Team
-                  </Text>
-                  <Text className="text-sm text-gray-500 text-center mb-6 px-4">
-                    Add your first member to unlock real-time task delegation,
-                    workflow automation, and collaborative analytics!
-                  </Text>
-                  <TouchableOpacity
-                    onPress={() => setModalVisible(true)}
-                    className="w-full bg-primary py-3.5 rounded-xl items-center mb-3 flex-row justify-center gap-2"
-                  >
-                    <Ionicons name="add" size={20} color="white" />
-                    <Text className="text-white font-semibold text-base">
-                      Invite Team Member
-                    </Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    onPress={handleCopy}
-                    className="w-full bg-gray-50 py-3.5 rounded-xl items-center border border-gray-200 flex-row justify-center gap-2"
-                  >
-                    <Ionicons name="copy-outline" size={18} color="#4B5563" />
-                    <Text className="text-gray-700 font-semibold text-base">
-                      {copied ? "Invite Link Copied! ✓" : "Copy Invite Link"}
-                    </Text>
-                  </TouchableOpacity>
+            ))}
+          </View>
+          <View
+            className={`mt-6 ${isDark ? "bg-gray-400 border-gray-300" : "bg-white border-gray-200"} border border-gray-200 rounded-2xl p-6 shadow-sm shadow-black/5 items-center`}
+          >
+            {isAdmin || isLead ? (
+              <View className="items-center w-full">
+                <View className="w-16 h-16 bg-blue-50 rounded-full items-center justify-center mb-4">
+                  <Ionicons name="people-outline" size={32} color="#3B82F6" />
                 </View>
-              ) : (
-                <View className="items-center w-full">
-                  <View className="w-16 h-16 bg-violet-50 rounded-full items-center justify-center mb-4">
-                    <Ionicons
-                      name="shield-checkmark-outline"
-                      size={32}
-                      color={isDark ? "white" : "#7C3AED"}
-                    />
-                  </View>
-                  <Text className="text-lg font-bold text-gray-900 text-center mb-2">
-                    Focus on Your Workload
+
+                <Text className="text-lg font-bold text-gray-900 text-center mb-2">
+                  Build Your Dream Team
+                </Text>
+
+                <Text className="text-sm text-gray-500 text-center mb-6 px-4">
+                  Add your first member to unlock real-time task delegation,
+                  workflow automation, and collaborative analytics!
+                </Text>
+
+                <TouchableOpacity
+                  onPress={() => setModalVisible(true)}
+                  className="w-full bg-primary py-3.5 rounded-xl items-center mb-3 flex-row justify-center gap-2"
+                >
+                  <Ionicons name="add" size={20} color="white" />
+                  <Text className="text-white font-semibold text-base">
+                    Invite Team Member
                   </Text>
-                  <Text className="text-sm text-gray-500 text-center mb-6 px-4">
-                    Your team roster is managed by Admins and Leads. Get started
-                    by viewing and working on your assigned tasks!
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  onPress={handleCopy}
+                  className="w-full bg-gray-50 py-3.5 rounded-xl items-center border border-gray-200 flex-row justify-center gap-2"
+                >
+                  <Ionicons name="copy-outline" size={18} color="#4B5563" />
+                  <Text className="text-gray-700 font-semibold text-base">
+                    {copied ? "Invite Link Copied! ✓" : "Copy Invite Link"}
                   </Text>
-                  <TouchableOpacity
-                    onPress={() => router.push("/task")}
-                    className="w-full bg-primary py-3.5 rounded-xl items-center flex-row justify-center gap-2"
-                  >
-                    <Ionicons
-                      name="clipboard-outline"
-                      size={18}
-                      color="white"
-                    />
-                    <Text className="text-white font-semibold text-base">
-                      Go to My Tasks
-                    </Text>
-                  </TouchableOpacity>
+                </TouchableOpacity>
+              </View>
+            ) : (
+              <View className="items-center w-full">
+                <View className="w-16 h-16 bg-violet-50 rounded-full items-center justify-center mb-4">
+                  <Ionicons
+                    name="shield-checkmark-outline"
+                    size={32}
+                    color="#7C3AED"
+                  />
                 </View>
-              )}
-            </View>
-          )}
+
+                <Text className="text-lg font-bold text-gray-900 text-center mb-2">
+                  Focus on Your Workload
+                </Text>
+
+                <Text className="text-sm text-gray-500 text-center mb-6 px-4">
+                  Your team roster is managed by Admins and Leads. Get started
+                  by viewing your tasks.
+                </Text>
+
+                <TouchableOpacity
+                  onPress={() => router.push("/task")}
+                  className="w-full bg-primary py-3.5 rounded-xl items-center flex-row justify-center gap-2"
+                >
+                  <Ionicons name="clipboard-outline" size={18} color="white" />
+                  <Text className="text-white font-semibold text-base">
+                    Go to My Tasks
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            )}
+          </View>
         </ScrollView>
+
         <View className="mt-6">
           <Text className="text-lg font-bold">Recent Activity</Text>
           {recentActivity.length > 0 ? (
