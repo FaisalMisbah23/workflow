@@ -1,14 +1,9 @@
 import { supabase } from "@/lib/supabase";
+import { showToast } from "@/utils/toast";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
-import {
-    ActivityIndicator,
-    Alert,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
-} from "react-native";
+import { Alert, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { Bounce } from "react-native-animated-spinkit";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const AcceptInvite = () => {
@@ -45,23 +40,32 @@ const AcceptInvite = () => {
 
   const handleAccept = async () => {
     if (!fullname || !email || !password) {
-      Alert.alert("Error", "Please fill in all fields.");
+      showToast("Please fill in all fields.", "error");
       return;
     }
-    if (invite?.email && email.trim().toLowerCase() !== invite.email.toLowerCase()) {
-      Alert.alert("Error", "This invitation is for a different email address.");
+    if (
+      invite?.email &&
+      email.trim().toLowerCase() !== invite.email.toLowerCase()
+    ) {
+      showToast("This invitation is for a different email address.", "error");
       return;
     }
     setSubmitting(true);
 
     // Try to sign up
-    const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
-      email,
-      password,
-    });
+    const { data: signUpData, error: signUpError } = await supabase.auth.signUp(
+      {
+        email,
+        password,
+      },
+    );
 
     // If user already exists, switch to sign-in flow
-    if (signUpError && (signUpError.message.includes("already registered") || signUpError.status === 422)) {
+    if (
+      signUpError &&
+      (signUpError.message.includes("already registered") ||
+        signUpError.status === 422)
+    ) {
       setUserExists(true);
       setSubmitting(false);
       return;
@@ -88,7 +92,7 @@ const AcceptInvite = () => {
     });
 
     if (profileError) {
-      Alert.alert("Error", profileError.message);
+      showToast(profileError.message, "error");
       setSubmitting(false);
       return;
     }
@@ -96,38 +100,38 @@ const AcceptInvite = () => {
     await supabase.from("invites").delete().eq("token", token);
 
     setSubmitting(false);
-    Alert.alert(
-      "Success",
-      "Account created! Please sign in.",
-      [{ text: "OK", onPress: () => router.replace("/signin") }]
-    );
+    showToast("Account created! Please sign in.", "success");
   };
 
   const handleSignIn = async () => {
     if (!email || !password) {
-      Alert.alert("Error", "Please fill in all fields.");
+      showToast("Please fill in all fields.", "error");
       return;
     }
-    if (invite?.email && email.trim().toLowerCase() !== invite.email.toLowerCase()) {
-      Alert.alert("Error", "This invitation is for a different email address.");
+    if (
+      invite?.email &&
+      email.trim().toLowerCase() !== invite.email.toLowerCase()
+    ) {
+      showToast("This invitation is for a different email address.", "error");
       return;
     }
     setSubmitting(true);
 
-    const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
+    const { data: signInData, error: signInError } =
+      await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
 
     if (signInError) {
-      Alert.alert("Error", signInError.message);
+      showToast("Invalid email or password.", "error");
       setSubmitting(false);
       return;
     }
 
     const userId = signInData.user?.id;
     if (!userId) {
-      Alert.alert("Error", "Could not sign in. Try again.");
+      showToast("Could not sign in. Try again.", "error");
       setSubmitting(false);
       return;
     }
@@ -142,7 +146,7 @@ const AcceptInvite = () => {
       .eq("id", userId);
 
     if (profileError) {
-      Alert.alert("Error", profileError.message);
+      showToast(profileError.message, "error");
       setSubmitting(false);
       return;
     }
@@ -150,17 +154,13 @@ const AcceptInvite = () => {
     await supabase.from("invites").delete().eq("token", token);
 
     setSubmitting(false);
-    Alert.alert(
-      "Success",
-      "You've joined the organization!",
-      [{ text: "OK", onPress: () => router.replace("/(tabs)/home") }]
-    );
+    showToast("You've joined the organization!", "success");
   };
 
   if (loading) {
     return (
       <SafeAreaView className="flex-1 items-center justify-center">
-        <ActivityIndicator size="large" />
+        <Bounce size={60} className="mx-auto" />
       </SafeAreaView>
     );
   }
@@ -168,7 +168,9 @@ const AcceptInvite = () => {
   if (error) {
     return (
       <SafeAreaView className="flex-1 items-center justify-center p-5">
-        <Text className="text-xl font-bold text-red-500 text-center">{error}</Text>
+        <Text className="text-xl font-bold text-red-500 text-center">
+          {error}
+        </Text>
         <TouchableOpacity
           className="mt-6 bg-primary px-6 py-3 rounded-lg"
           onPress={() => router.replace("/signin")}
@@ -216,7 +218,9 @@ const AcceptInvite = () => {
           <TextInput
             value={password}
             onChangeText={setPassword}
-            placeholder={userExists ? "Enter your password" : "Create a password"}
+            placeholder={
+              userExists ? "Enter your password" : "Create a password"
+            }
             secureTextEntry
             className="border border-secondary rounded-lg p-4 bg-surface"
           />
@@ -228,7 +232,7 @@ const AcceptInvite = () => {
           disabled={submitting}
         >
           {submitting ? (
-            <ActivityIndicator color="white" />
+            <Bounce color="white" />
           ) : (
             <Text className="text-white font-bold text-base">
               {userExists ? "Sign In & Join" : "Create Account & Join"}
@@ -241,7 +245,9 @@ const AcceptInvite = () => {
             className="items-center mt-2"
             onPress={() => router.replace("/signin")}
           >
-            <Text className="text-secondary">Already have an account? Sign in</Text>
+            <Text className="text-secondary">
+              Already have an account? Sign in
+            </Text>
           </TouchableOpacity>
         )}
       </View>
