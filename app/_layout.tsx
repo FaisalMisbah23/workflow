@@ -1,6 +1,6 @@
 import "@/assets/styles/global.css";
 import NotificationProvider from "@/context/NotificationContext";
-import { ThemeContext, ThemeProvider } from "@/context/ThemeContext";
+import { ThemeProvider } from "@/context/ThemeContext";
 import UserProvider, { UserContext } from "@/context/UserContext";
 import Ionicons from "@expo/vector-icons/build/Ionicons";
 import { Stack, useRouter } from "expo-router";
@@ -11,7 +11,6 @@ import Toast from "react-native-toast-message";
 function RootLayoutContent() {
   const router = useRouter();
   const { user } = useContext(UserContext);
-  const { isDark } = useContext(ThemeContext);
   const isDarkMode = useColorScheme();
 
   return (
@@ -68,7 +67,7 @@ function RootLayoutContent() {
             <Stack.Screen
               name="createtask"
               options={{ title: "Create New Task" }}
-              className="dark:bg-gray-900"
+              style={{ backgroundColor: isDarkMode ? "#1F2937" : "#fff" }}
             />
             <Stack.Screen
               name="createorganization"

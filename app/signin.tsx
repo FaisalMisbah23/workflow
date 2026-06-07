@@ -96,7 +96,7 @@ const signin = () => {
         </View>
         <View className="flex flex-row mt-6 justify-center">
           <Text className="text-black dark:text-gray-200 underline">
-            Don't have an account?{" "}
+            Don't have an account?
           </Text>
           <TouchableOpacity onPress={() => router.push("/signup")}>
             <Text className="text-blue-700 text-[15px] dark:text-blue-500">

@@ -393,7 +393,7 @@ const Profile = () => {
                         <Text
                           className={`${isDark ? "text-gray-400" : "text-gray-500"} text-sm`}
                         >
-                          @{profile.email}
+                          {profile.email}
                         </Text>
                       ) : null}
                       {profile?.bio && (

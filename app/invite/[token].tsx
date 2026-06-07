@@ -52,10 +52,11 @@ const AcceptInvite = () => {
     }
     setSubmitting(true);
 
+    const normalizedEmail = email.trim().toLowerCase();
     // Try to sign up
     const { data: signUpData, error: signUpError } = await supabase.auth.signUp(
       {
-        email,
+        email: normalizedEmail,
         password,
       },
     );

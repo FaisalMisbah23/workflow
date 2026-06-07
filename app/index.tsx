@@ -1,12 +1,11 @@
 import Ionicons from "@expo/vector-icons/build/Ionicons";
 import { useRouter } from "expo-router";
-import { Text, TouchableOpacity, useColorScheme, View } from "react-native";
+import { Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import "react-native-url-polyfill/auto";
 
 export default function Index() {
   const router = useRouter();
-  const colorScheme = useColorScheme();
 
   return (
     <SafeAreaView className="flex-1 items-center justify-center dark:bg-gray-900">
@@ -14,8 +13,7 @@ export default function Index() {
         <Ionicons
           name="checkmark-circle-outline"
           size={60}
-          className="bg-[#b3b3b6] dark:bg-white p-3 w-[20%] rounded-xl opacity-50"
-          color={colorScheme === "dark" ? "#fff" : "#000"}
+          className="bg-[#b3b3b6] dark:bg-white text-white dark:text-black p-3 w-[20%] rounded-xl opacity-50"
         />
         <Text className="text-[35px] font-bold dark:text-white">Workflow</Text>
         <Text className="text-secondary dark:text-white">
@@ -27,7 +25,7 @@ export default function Index() {
           <Ionicons
             name="checkmark-circle-outline"
             size={20}
-            color={colorScheme === "dark" ? "#fff" : "#000"}
+            className="text-white dark:text-black"
           />
           <Text className="dark:text-white">
             Track tasks and projects in real-time

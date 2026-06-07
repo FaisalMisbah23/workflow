@@ -383,11 +383,9 @@ const UserProvider = ({ children }) => {
 
     // Lead can assign to their team members
     if (profile.role === "lead") {
-      const isTeamMember = teamMembers.some((m) => {
-        // Check if assignee is a team member
-        return m.id && m.role === "member";
-      });
-      return isTeamMember;
+      return teamMembers.some(
+        (m) => m.email?.toLowerCase() === assigneeEmail?.toLowerCase(),
+      );
     }
 
     // Member can only self-assign

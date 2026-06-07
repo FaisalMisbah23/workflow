@@ -4,7 +4,7 @@ import { supabase } from "@/lib/supabase";
 import Ionicons from "@expo/vector-icons/build/Ionicons";
 import { Tabs, useFocusEffect, useRouter } from "expo-router";
 import React, { useContext, useEffect } from "react";
-const _layout = () => {
+const Layout = () => {
   const { isLoggedIn, loading, user, profile, setProfile, setOrg } = useContext(
     UserContext,
   ) as any;
@@ -139,4 +139,4 @@ const _layout = () => {
   );
 };
 
-export default _layout;
+export default Layout;
