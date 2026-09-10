@@ -1,10 +1,11 @@
+import { getSettings, updateSetting } from "@/lib/storage";
 import { supabase } from "@/lib/supabase";
 import { showToast } from "@/utils/toast";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as FileSystem from "expo-file-system";
 import * as Linking from "expo-linking";
 import { useRouter } from "expo-router";
-import React, { createContext, useEffect, useState } from "react";
+import React, { createContext, useCallback, useEffect, useState } from "react";
 import { Platform } from "react-native";
 export const UserContext = createContext();
 
@@ -27,8 +28,24 @@ const UserProvider = ({ children }) => {
   const [teamMembers, setTeamMembers] = useState([]);
   const [isAdmin, setIsAdmin] = useState(false);
   const [isLead, setIsLead] = useState(false);
+  const [settings, setSettings] = useState({
+    notifications: { email: true, push: true, taskUpdates: true, deadlineReminders: true },
+    darkMode: false,
+    language: "en",
+  });
 
   const router = useRouter();
+
+  // Load settings on mount
+  useEffect(() => {
+    getSettings().then(setSettings);
+  }, []);
+
+  const handleUpdateSettings = useCallback(async (key, value) => {
+    const updated = await updateSetting(key, value);
+    setSettings(updated);
+    return updated;
+  }, []);
 
   // Handle deep links (recovery tokens, invitations, etc.)
   useEffect(() => {
@@ -421,6 +438,8 @@ const UserProvider = ({ children }) => {
         fetchTeamMembers,
         canAssignTask,
         getAssignableUsers,
+        settings,
+        updateSettings: handleUpdateSettings,
       }}
     >
       {children}

@@ -1,3 +1,4 @@
+import { ThemeContext } from "@/context/ThemeContext";
 import { UserContext } from "@/context/UserContext";
 import { supabase } from "@/lib/supabase";
 import Ionicons from "@expo/vector-icons/build/Ionicons";
@@ -8,6 +9,7 @@ const _layout = () => {
   const { isLoggedIn, loading, user, profile, setProfile, setOrg } = useContext(
     UserContext,
   ) as any;
+  const { isDark } = useContext(ThemeContext);
   const router = useRouter();
 
   useEffect(() => {
@@ -49,12 +51,13 @@ const _layout = () => {
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: "#000",
-        tabBarInactiveTintColor: "#cdcde0",
+        tabBarActiveTintColor: isDark ? "#fff" : "#000",
+        tabBarInactiveTintColor: isDark ? "#64748b" : "#cdcde0",
         tabBarStyle: {
           height: 65,
           paddingTop: 5,
           borderRadius: 15,
+          backgroundColor: isDark ? "#1e293b" : "#fff",
         },
         tabBarLabelStyle: {
           fontSize: 10,
