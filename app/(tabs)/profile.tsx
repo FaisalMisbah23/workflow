@@ -1,4 +1,5 @@
 import Settings from "@/components/Settings";
+import { ThemeContext } from "@/context/ThemeContext";
 import { UserContext } from "@/context/UserContext";
 import { supabase } from "@/lib/supabase";
 import Ionicons from "@expo/vector-icons/build/Ionicons";
@@ -23,6 +24,7 @@ const Profile = () => {
   const router = useRouter();
   const { user, isLoggedIn, uploadImage, profile, Org, setProfile } =
     useContext(UserContext) as any;
+  const { isDark } = useContext(ThemeContext);
   const [url, setUrl] = useState("");
   const [image, setImage] = useState(profile?.avatar_url || null);
   const [isEditing, setIsEditing] = useState(false);
@@ -277,11 +279,11 @@ const Profile = () => {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-gray-50">
+    <SafeAreaView className={`flex-1 ${isDark ? "bg-slate-900" : "bg-gray-50"}`}>
       <ScrollView className="flex-1">
         <View className="p-5">
           {/* Profile Header Card */}
-          <View className="bg-white rounded-2xl shadow-sm overflow-hidden mb-6  flex items-center">
+          <View className={`${isDark ? "bg-slate-800" : "bg-white"} rounded-2xl shadow-sm overflow-hidden mb-6 flex items-center`}>
             {/* Banner */}
             <View className="bg-gradient-to-r from-primary to-primary/80 h-20" />
 
@@ -328,14 +330,16 @@ const Profile = () => {
                         value={editFullname}
                         onChangeText={setEditFullname}
                         placeholder="Full Name"
-                        className="bg-gray-100 border border-gray-200 rounded-lg px-3 py-2 text-base"
+                        className={`${isDark ? "bg-slate-700 border-slate-600 text-white" : "bg-gray-100 border-gray-200 text-gray-900"} border rounded-lg px-3 py-2 text-base`}
+                        placeholderTextColor={isDark ? "#9CA3AF" : "#6B7280"}
                       />
 
                       <TextInput
                         value={editUsername}
                         onChangeText={setEditUsername}
                         placeholder="Username"
-                        className="bg-gray-100 border border-gray-200 rounded-lg px-3 py-2 text-base"
+                        className={`${isDark ? "bg-slate-700 border-slate-600 text-white" : "bg-gray-100 border-gray-200 text-gray-900"} border rounded-lg px-3 py-2 text-base`}
+                        placeholderTextColor={isDark ? "#9CA3AF" : "#6B7280"}
                       />
                       <TextInput
                         value={editBio}
@@ -343,7 +347,8 @@ const Profile = () => {
                         placeholder="Bio (optional)"
                         multiline
                         numberOfLines={2}
-                        className="bg-gray-100 border border-gray-200 rounded-lg px-3 py-2 text-base"
+                        className={`${isDark ? "bg-slate-700 border-slate-600 text-white" : "bg-gray-100 border-gray-200 text-gray-900"} border rounded-lg px-3 py-2 text-base`}
+                        placeholderTextColor={isDark ? "#9CA3AF" : "#6B7280"}
                       />
                       <View className="flex-row gap-2 mt-2">
                         <TouchableOpacity
@@ -372,21 +377,21 @@ const Profile = () => {
                     </View>
                   ) : (
                     <View>
-                      <Text className="text-gray-900 text-lg font-semibold">
+                      <Text className={`${isDark ? "text-white" : "text-gray-900"} text-lg font-semibold`}>
                         {profile?.fullname}
                       </Text>
                       {profile?.username ? (
-                        <Text className="text-gray-500 text-sm">
+                        <Text className={`${isDark ? "text-gray-400" : "text-gray-500"} text-sm`}>
                           @{profile.username}
                         </Text>
                       ) : null}
                       {profile?.email ? (
-                        <Text className="text-gray-500 text-sm">
-                          @{profile.email}
+                        <Text className={`${isDark ? "text-gray-400" : "text-gray-500"} text-sm`}>
+                          {profile.email}
                         </Text>
                       ) : null}
                       {profile?.bio && (
-                        <Text className="text-gray-600 text-sm mt-1 line-clamp-2">
+                        <Text className={`${isDark ? "text-gray-300" : "text-gray-600"} text-sm mt-1 line-clamp-2`}>
                           {profile?.bio}
                         </Text>
                       )}
@@ -400,17 +405,17 @@ const Profile = () => {
                 <View className="mt-4 flex-row gap-2">
                   <TouchableOpacity
                     onPress={() => setIsEditing(true)}
-                    className="flex items-center justify-center w-1/3 bg-primary  rounded-lg"
+                    className="flex-1 items-center justify-center bg-primary py-2.5 rounded-lg"
                   >
-                    <Text className="text-white text-center font-medium text-md">
+                    <Text className="text-white text-center font-medium text-sm">
                       Edit Profile
                     </Text>
                   </TouchableOpacity>
                   <TouchableOpacity
                     onPress={() => setShowChangePassword(true)}
-                    className="flex items-center justify-center w-[120px] bg-gray-200  rounded-lg"
+                    className={`flex-1 items-center justify-center py-2.5 rounded-lg ${isDark ? "bg-slate-600" : "bg-gray-200"}`}
                   >
-                    <Text className="text-gray-700 text-center font-medium text-md">
+                    <Text className={`${isDark ? "text-white" : "text-gray-700"} text-center font-medium text-sm`}>
                       Change Password
                     </Text>
                   </TouchableOpacity>
@@ -430,26 +435,26 @@ const Profile = () => {
           </View>
 
           {/* Stats Card */}
-          <View className="bg-white rounded-2xl shadow-sm p-5 mb-6">
-            <Text className="text-lg font-semibold text-gray-900 mb-4">
+          <View className={`${isDark ? "bg-slate-800" : "bg-white"} rounded-2xl shadow-sm p-5 mb-6`}>
+            <Text className={`text-lg font-semibold ${isDark ? "text-white" : "text-gray-900"} mb-4`}>
               Profile Details
             </Text>
             <View className="space-y-3">
-              <View className="flex-row justify-between items-center py-2 border-b border-gray-100">
-                <Text className="text-gray-500 text-sm">Role</Text>
-                <Text className="text-gray-900 font-medium capitalize">
+              <View className={`flex-row justify-between items-center py-2 border-b ${isDark ? "border-slate-700" : "border-gray-100"}`}>
+                <Text className={`${isDark ? "text-gray-400" : "text-gray-500"} text-sm`}>Role</Text>
+                <Text className={`${isDark ? "text-white" : "text-gray-900"} font-medium capitalize`}>
                   {profile?.role ?? "Member"}
                 </Text>
               </View>
-              <View className="flex-row justify-between items-center py-2 border-b border-gray-100">
-                <Text className="text-gray-500 text-sm">Organization</Text>
-                <Text className="text-gray-900 font-medium">
+              <View className={`flex-row justify-between items-center py-2 border-b ${isDark ? "border-slate-700" : "border-gray-100"}`}>
+                <Text className={`${isDark ? "text-gray-400" : "text-gray-500"} text-sm`}>Organization</Text>
+                <Text className={`${isDark ? "text-white" : "text-gray-900"} font-medium`}>
                   {Org[0]?.name || "None"}
                 </Text>
               </View>
-              <View className="flex-row justify-between items-center py-2">
-                <Text className="text-gray-500 text-sm">Joined</Text>
-                <Text className="text-gray-900 font-medium">
+              <View className={`flex-row justify-between items-center py-2`}>
+                <Text className={`${isDark ? "text-gray-400" : "text-gray-500"} text-sm`}>Joined</Text>
+                <Text className={`${isDark ? "text-white" : "text-gray-900"} font-medium`}>
                   {user?.user?.created_at?.slice(0, 10)}
                 </Text>
               </View>
@@ -471,18 +476,18 @@ const Profile = () => {
         onRequestClose={() => setShowChangePassword(false)}
       >
         <View className="flex-1 bg-black/50 justify-end">
-          <View className="bg-white rounded-t-3xl p-6">
+          <View className={`${isDark ? "bg-slate-800" : "bg-white"} rounded-t-3xl p-6`}>
             <View className="flex-row justify-between items-center mb-6">
-              <Text className="text-xl font-bold text-gray-900">
+              <Text className={`text-xl font-bold ${isDark ? "text-white" : "text-gray-900"}`}>
                 Change Password
               </Text>
               <TouchableOpacity onPress={() => setShowChangePassword(false)}>
-                <Ionicons name="close" size={24} color="#6B7280" />
+                <Ionicons name="close" size={24} color={isDark ? "#9CA3AF" : "#6B7280"} />
               </TouchableOpacity>
             </View>
             <View className="space-y-4">
               <View>
-                <Text className="text-sm font-medium text-gray-700 mb-2">
+                <Text className={`text-sm font-medium ${isDark ? "text-gray-300" : "text-gray-700"} mb-2`}>
                   Current Password
                 </Text>
                 <TextInput
@@ -490,11 +495,12 @@ const Profile = () => {
                   onChangeText={setCurrentPassword}
                   placeholder="Enter current password"
                   secureTextEntry
-                  className="bg-gray-100 border border-gray-200 rounded-xl px-4 py-3 text-base"
+                  className={`${isDark ? "bg-slate-700 border-slate-600 text-white" : "bg-gray-100 border-gray-200 text-gray-900"} border rounded-xl px-4 py-3 text-base`}
+                  placeholderTextColor={isDark ? "#9CA3AF" : "#6B7280"}
                 />
               </View>
               <View>
-                <Text className="text-sm font-medium text-gray-700 mb-2">
+                <Text className={`text-sm font-medium ${isDark ? "text-gray-300" : "text-gray-700"} mb-2`}>
                   New Password
                 </Text>
                 <TextInput
@@ -502,15 +508,16 @@ const Profile = () => {
                   onChangeText={setNewPassword}
                   placeholder="Enter new password"
                   secureTextEntry
-                  className="bg-gray-100 border border-gray-200 rounded-xl px-4 py-3 text-base"
+                  className={`${isDark ? "bg-slate-700 border-slate-600 text-white" : "bg-gray-100 border-gray-200 text-gray-900"} border rounded-xl px-4 py-3 text-base`}
+                  placeholderTextColor={isDark ? "#9CA3AF" : "#6B7280"}
                 />
-                <Text className="text-xs text-gray-500 mt-2">
+                <Text className={`${isDark ? "text-gray-400" : "text-gray-500"} text-xs mt-2`}>
                   Must be at least 8 characters with uppercase, lowercase, and
                   number
                 </Text>
               </View>
               <View>
-                <Text className="text-sm font-medium text-gray-700 mb-2">
+                <Text className={`text-sm font-medium ${isDark ? "text-gray-300" : "text-gray-700"} mb-2`}>
                   Confirm Password
                 </Text>
                 <TextInput
@@ -518,7 +525,8 @@ const Profile = () => {
                   onChangeText={setConfirmPassword}
                   placeholder="Confirm new password"
                   secureTextEntry
-                  className="bg-gray-100 border border-gray-200 rounded-xl px-4 py-3 text-base"
+                  className={`${isDark ? "bg-slate-700 border-slate-600 text-white" : "bg-gray-100 border-gray-200 text-gray-900"} border rounded-xl px-4 py-3 text-base`}
+                  placeholderTextColor={isDark ? "#9CA3AF" : "#6B7280"}
                 />
               </View>
               <TouchableOpacity

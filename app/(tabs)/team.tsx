@@ -1,3 +1,4 @@
+import { ThemeContext } from "@/context/ThemeContext";
 import { UserContext } from "@/context/UserContext";
 import { supabase } from "@/lib/supabase";
 import Ionicons from "@expo/vector-icons/build/Ionicons";
@@ -39,6 +40,7 @@ const Team = () => {
   const [roleOverrides, setRoleOverrides] = useState<Record<string, string>>(
     {},
   );
+  const { isDark } = useContext(ThemeContext);
   const [recentActivity, setRecentActivity] = useState<any[]>([]);
   const orgId = Org?.[0]?.id;
   const visibleTeamMembers = teamMembers
@@ -204,12 +206,112 @@ const Team = () => {
   };
 
   const roleOptions = isAdmin ? ["admin", "lead", "member"] : ["member"];
+  const admins = visibleTeamMembers.filter((user) => user.role === "admin");
+  const leads = visibleTeamMembers.filter((user) => user.role === "lead");
+  const members = visibleTeamMembers.filter((user) => user.role === "member");
+
+  const TeamCard = ({
+    item,
+    isAdmin,
+    profile,
+    onChangeRole,
+    onRemoveMember,
+    roleOverrides,
+  }: any) => (
+    <View
+      className={`w-full rounded-2xl p-4 mb-3 shadow-sm border ${
+        isDark ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"
+      }`}
+      style={{
+        width: "100%",
+        alignSelf: "flex-start",
+      }}
+    >
+      <View className="flex-row items-center">
+        {/* Avatar */}
+        <View className="w-10 h-10 bg-primary rounded-full items-center justify-center">
+          <Text className="text-white font-semibold">
+            {item.fullname?.slice(0, 2).toUpperCase()}
+          </Text>
+        </View>
+
+        {/* Info */}
+        <View className="ml-3 flex-1">
+          <Text
+            numberOfLines={1}
+            className={`font-semibold ${isDark ? "text-white" : "text-black"}`}
+          >
+            {item.fullname}
+          </Text>
+
+          <Text className="text-gray-500 text-[11px]">{item.email}</Text>
+
+          <View className="flex-row items-center mt-1">
+            <View
+              className={`px-2 py-1 rounded-full ${
+                item.role === "lead"
+                  ? "bg-purple-100"
+                  : item.role === "admin"
+                    ? "bg-red-100"
+                    : "bg-green-100"
+              }`}
+            >
+              <Text
+                className={`text-xs font-semibold capitalize ${
+                  item.role === "lead"
+                    ? "text-purple-600"
+                    : item.role === "admin"
+                      ? "text-red-600"
+                      : "text-green-600"
+                }`}
+              >
+                {item.role}
+              </Text>
+            </View>
+          </View>
+
+          {/* ROLE PICKER */}
+          {isAdmin && item.id !== profile?.id && (
+            <View className="mt-3 border rounded-lg overflow-hidden">
+              <Picker
+                selectedValue={roleOverrides?.[item.id] || item.role}
+                onValueChange={(value) => onChangeRole(item.id, value)}
+                style={{
+                  height: 47,
+                  color: isDark ? "white" : "black",
+                }}
+                dropdownIconColor={isDark ? "white" : "black"}
+              >
+                <Picker.Item label="Admin" value="admin" />
+                <Picker.Item label="Lead" value="lead" />
+                <Picker.Item label="Member" value="member" />
+              </Picker>
+            </View>
+          )}
+        </View>
+
+        {/* DELETE BUTTON */}
+        {isAdmin && item.id !== profile?.id && (
+          <TouchableOpacity
+            onPress={() => onRemoveMember(item)}
+            className="p-2"
+          >
+            <Ionicons name="person-remove-sharp" size={20} color="#EF4444" />
+          </TouchableOpacity>
+        )}
+      </View>
+    </View>
+  );
 
   return (
-    <SafeAreaView className="flex-1">
+    <SafeAreaView className={`flex-1 ${isDark ? "bg-slate-900" : "bg-white"}`}>
       <View className="p-5">
         <View className="flex-row justify-between items-center mb-4">
-          <Text className="text-2xl font-bold">Team</Text>
+          <Text
+            className={`text-2xl font-bold ${isDark ? "text-white" : "text-black"}`}
+          >
+            Team
+          </Text>
           {(isAdmin || isLead) && (
             <TouchableOpacity
               className="flex-row gap-2 bg-primary px-4 py-3 rounded-lg"
@@ -220,7 +322,9 @@ const Team = () => {
             </TouchableOpacity>
           )}
         </View>
-        <Text className="text-gray-600 text-base mb-4">
+        <Text
+          className={`${isDark ? "text-gray-300" : "text-gray-600"} text-base mb-4`}
+        >
           {visibleTeamMembers?.length ?? 0} team members
         </Text>
         <View className="flex flex-row gap-2">
@@ -247,7 +351,11 @@ const Team = () => {
             </View>
           </View>
         </View>
-        <Text className="mt-6 text-lg font-bold">Departments</Text>
+        <Text
+          className={`mt-6 text-lg font-bold ${isDark ? "text-white" : "text-black"}`}
+        >
+          Departments
+        </Text>
         <View className="flex-row gap-2 flex-wrap mt-3">
           {departments.length > 0 ? (
             departments.map((item, index) => (
@@ -265,136 +373,174 @@ const Team = () => {
           )}
         </View>
         <View className="mt-6">
-          <Text className="text-lg font-bold">Team members</Text>
+          <Text
+            className={`text-lg font-bold ${isDark ? "text-white" : "text-black"}`}
+          >
+            Team members
+          </Text>
         </View>
+
         <ScrollView
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{ paddingBottom: 350 }}
         >
           {visibleTeamMembers && visibleTeamMembers.length > 0 ? (
-            visibleTeamMembers.map((item: any) => (
-              <View
-                key={item.id}
-                className="mt-4 border border-gray-200 rounded-xl p-4"
-              >
-                <View className="flex-row w-full">
-                  <View className="w-12 h-12 bg-primary rounded-full items-center justify-center">
-                    <Text className="text-white text-center font-semibold">
-                      {item.fullname?.slice(0, 2).toUpperCase()}
-                    </Text>
+            <View className="relative pl-6">
+              {/* MAIN VERTICAL LINE (ADMIN LEVEL) */}
+              <View className="absolute left-3 top-0 bottom-0 w-[2px] bg-gray-300" />
+
+              {admins.map((admin) => (
+                <View key={admin.id} className="mb-6">
+                  {/* ADMIN NODE */}
+                  <View className="flex-row items-center">
+                    <View className="w-3 h-3 bg-primary rounded-full absolute left-3" />
+
+                    {/* horizontal line */}
+                    <View className="w-2 h-[2px] bg-gray-300 absolute left-[-10px]" />
+                    <View className="w-2.5 h-2.5 bg-red-600 rounded-full absolute left-[-6px]" />
+
+                    <TeamCard
+                      item={admin}
+                      isAdmin={isAdmin}
+                      profile={profile}
+                      onChangeRole={handleChangeRole}
+                      onRemoveMember={handleRemoveMember}
+                      roleOverrides={roleOverrides}
+                    />
                   </View>
-                  <View className="ml-4 flex-1">
-                    <Text className="text-lg font-semibold">
-                      {item.fullname}
-                    </Text>
-                    <Text className="text-gray-600 text-sm">{item.email}</Text>
-                    <Text className="text-gray-500 text-sm capitalize">
-                      {item.role}
-                    </Text>
-                    {isAdmin && item.id !== profile?.id && (
-                      <View className="mt-3">
-                        <Text className="text-xs text-gray-500 mb-1">
-                          Change Role
-                        </Text>
-                        <View className="border border-gray-300 rounded-lg">
-                          <Picker
-                            selectedValue={item.role}
-                            onValueChange={(value) =>
-                              handleChangeRole(item.id, value)
-                            }
-                          >
-                            <Picker.Item label="Admin" value="admin" />
-                            <Picker.Item label="Lead" value="lead" />
-                            <Picker.Item label="Member" value="member" />
-                          </Picker>
+
+                  {/* LEADS */}
+                  <View className="ml-6 relative pl-6 mt-3">
+                    {leads.map((lead) => (
+                      <View key={lead.id} className="mb-4">
+                        {/* LEAD NODE */}
+                        <View className="flex-row items-center">
+                          {/* vertical connector */}
+                          <View className="absolute left-[-24px] top-[-22px] bottom-[75px] w-[2px] bg-gray-300" />
+
+                          {/* horizontal connector */}
+                          <View className="w-28 h-[2px] bg-gray-300 absolute left-[-52px]" />
+                          <View className="w-2.5 h-2.5 bg-purple-500 rounded-full absolute left-[-6px]" />
+                          <TeamCard
+                            item={lead}
+                            isAdmin={isAdmin}
+                            profile={profile}
+                            onChangeRole={handleChangeRole}
+                            onRemoveMember={handleRemoveMember}
+                            roleOverrides={roleOverrides}
+                          />
+                        </View>
+
+                        {/* MEMBERS */}
+                        <View className="ml-6 relative pl-6 mt-2">
+                          {members.map((member) => (
+                            <View
+                              key={member.id}
+                              className="flex-row items-center mb-2"
+                            >
+                              {/* vertical connector */}
+                              <View className="absolute left-[-24px] top-[-20px] bottom-[80px] w-[2px] bg-gray-300" />
+
+                              {/* horizontal connector */}
+                              <View className="w-36 h-[2px] bg-gray-300 absolute left-[-95px]" />
+                              <View className="w-2 h-2 bg-green-500 rounded-full absolute left-[-6px]" />
+
+                              <TeamCard
+                                item={member}
+                                isAdmin={isAdmin}
+                                profile={profile}
+                                onChangeRole={handleChangeRole}
+                                onRemoveMember={handleRemoveMember}
+                                roleOverrides={roleOverrides}
+                              />
+                            </View>
+                          ))}
                         </View>
                       </View>
-                    )}
+                    ))}
                   </View>
-                  {isAdmin && item.id !== profile?.id && (
-                    <TouchableOpacity
-                      onPress={() => handleRemoveMember(item)}
-                      className="p-2"
-                    >
-                      <Ionicons
-                        name="trash-outline"
-                        size={24}
-                        color="#EF4444"
-                      />
-                    </TouchableOpacity>
-                  )}
                 </View>
-              </View>
-            ))
-          ) : (
-            <View className="mt-6 bg-white border border-gray-200 rounded-2xl p-6 shadow-sm shadow-black/5 items-center">
-              {isAdmin || isLead ? (
-                <View className="items-center w-full">
-                  <View className="w-16 h-16 bg-blue-50 rounded-full items-center justify-center mb-4">
-                    <Ionicons name="people-outline" size={32} color="#3B82F6" />
-                  </View>
-                  <Text className="text-lg font-bold text-gray-900 text-center mb-2">
-                    Build Your Dream Team
-                  </Text>
-                  <Text className="text-sm text-gray-500 text-center mb-6 px-4">
-                    Add your first member to unlock real-time task delegation,
-                    workflow automation, and collaborative analytics!
-                  </Text>
-                  <TouchableOpacity
-                    onPress={() => setModalVisible(true)}
-                    className="w-full bg-primary py-3.5 rounded-xl items-center mb-3 flex-row justify-center gap-2"
-                  >
-                    <Ionicons name="add" size={20} color="white" />
-                    <Text className="text-white font-semibold text-base">
-                      Invite Team Member
-                    </Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    onPress={handleCopy}
-                    className="w-full bg-gray-50 py-3.5 rounded-xl items-center border border-gray-200 flex-row justify-center gap-2"
-                  >
-                    <Ionicons name="copy-outline" size={18} color="#4B5563" />
-                    <Text className="text-gray-700 font-semibold text-base">
-                      {copied ? "Invite Link Copied! ✓" : "Copy Invite Link"}
-                    </Text>
-                  </TouchableOpacity>
-                </View>
-              ) : (
-                <View className="items-center w-full">
-                  <View className="w-16 h-16 bg-violet-50 rounded-full items-center justify-center mb-4">
-                    <Ionicons
-                      name="shield-checkmark-outline"
-                      size={32}
-                      color="#7C3AED"
-                    />
-                  </View>
-                  <Text className="text-lg font-bold text-gray-900 text-center mb-2">
-                    Focus on Your Workload
-                  </Text>
-                  <Text className="text-sm text-gray-500 text-center mb-6 px-4">
-                    Your team roster is managed by Admins and Leads. Get started
-                    by viewing and working on your assigned tasks!
-                  </Text>
-                  <TouchableOpacity
-                    onPress={() => router.push("/task")}
-                    className="w-full bg-primary py-3.5 rounded-xl items-center flex-row justify-center gap-2"
-                  >
-                    <Ionicons
-                      name="clipboard-outline"
-                      size={18}
-                      color="white"
-                    />
-                    <Text className="text-white font-semibold text-base">
-                      Go to My Tasks
-                    </Text>
-                  </TouchableOpacity>
-                </View>
-              )}
+              ))}
             </View>
-          )}
+          ) : null}
+
+          <View
+            className={`mt-6 ${isDark ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"} border rounded-2xl p-6 shadow-sm shadow-black/5 items-center`}
+          >
+            {isAdmin || isLead ? (
+              <View className="items-center w-full">
+                <View className="w-16 h-16 bg-blue-50 rounded-full items-center justify-center mb-4">
+                  <Ionicons name="people-outline" size={32} color="#3B82F6" />
+                </View>
+
+                <Text className="text-lg font-bold text-gray-900 text-center mb-2">
+                  Build Your Dream Team
+                </Text>
+
+                <Text className="text-sm text-gray-500 text-center mb-6 px-4">
+                  Add your first member to unlock real-time task delegation,
+                  workflow automation, and collaborative analytics!
+                </Text>
+
+                <TouchableOpacity
+                  onPress={() => setModalVisible(true)}
+                  className="w-full bg-primary py-3.5 rounded-xl items-center mb-3 flex-row justify-center gap-2"
+                >
+                  <Ionicons name="add" size={20} color="white" />
+                  <Text className="text-white font-semibold text-base">
+                    Invite Team Member
+                  </Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  onPress={handleCopy}
+                  className="w-full bg-gray-50 py-3.5 rounded-xl items-center border border-gray-200 flex-row justify-center gap-2"
+                >
+                  <Ionicons name="copy-outline" size={18} color="#4B5563" />
+                  <Text className="text-gray-700 font-semibold text-base">
+                    {copied ? "Invite Link Copied! ✓" : "Copy Invite Link"}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            ) : (
+              <View className="items-center w-full">
+                <View className="w-16 h-16 bg-violet-50 rounded-full items-center justify-center mb-4">
+                  <Ionicons
+                    name="shield-checkmark-outline"
+                    size={32}
+                    color="#7C3AED"
+                  />
+                </View>
+
+                <Text className="text-lg font-bold text-gray-900 text-center mb-2">
+                  Focus on Your Workload
+                </Text>
+
+                <Text className="text-sm text-gray-500 text-center mb-6 px-4">
+                  Your team roster is managed by Admins and Leads. Get started
+                  by viewing your tasks.
+                </Text>
+
+                <TouchableOpacity
+                  onPress={() => router.push("/task")}
+                  className="w-full bg-primary py-3.5 rounded-xl items-center flex-row justify-center gap-2"
+                >
+                  <Ionicons name="clipboard-outline" size={18} color="white" />
+                  <Text className="text-white font-semibold text-base">
+                    Go to My Tasks
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            )}
+          </View>
         </ScrollView>
+
         <View className="mt-6">
-          <Text className="text-lg font-bold">Recent Activity</Text>
+          <Text
+            className={`text-lg font-bold ${isDark ? "text-white" : "text-black"}`}
+          >
+            Recent Activity
+          </Text>
           {recentActivity.length > 0 ? (
             recentActivity.map((activity) => (
               <View
@@ -429,44 +575,74 @@ const Team = () => {
           className="flex-1 bg-black/50 justify-center items-center px-4"
           onPress={() => setModalVisible(false)}
         >
-          <Pressable className="bg-white w-full rounded-2xl p-5">
+          <Pressable
+            className={`${isDark ? "bg-gray-700" : "bg-white"} w-full rounded-2xl p-5`}
+          >
             <View className="flex-row justify-between items-start mb-4">
               <View>
-                <Text className="text-lg font-bold">Add Team Member</Text>
-                <Text className="text-gray-600 text-sm mt-1">
+                <Text
+                  className={`text-lg font-bold ${isDark ? "text-white" : "text-black"}`}
+                >
+                  Add Team Member
+                </Text>
+                <Text
+                  className={`text-sm mt-1 ${isDark ? "text-gray-400" : "text-gray-600"}`}
+                >
                   Invite someone to join organization
                 </Text>
               </View>
               <TouchableOpacity onPress={() => setModalVisible(false)}>
-                <Ionicons name="close" size={24} color="#6B7280" />
+                <Ionicons
+                  name="close"
+                  size={24}
+                  color={isDark ? "white" : "black"}
+                />
               </TouchableOpacity>
             </View>
 
-            <Text className="text-sm font-semibold mb-2">Invite via link</Text>
+            <Text
+              className={`text-sm font-semibold mb-2 ${isDark ? "text-white" : "text-black"}`}
+            >
+              Invite via link
+            </Text>
             <View className="flex-row gap-2 items-center mb-2">
-              <View className="flex-1 bg-gray-100 rounded-lg px-3 py-2">
-                <Text className="text-sm text-gray-700">{Invite_Link}</Text>
+              <View
+                className={`flex-1 ${isDark ? "bg-gray-600" : "bg-gray-100"} rounded-lg px-3 py-2`}
+              >
+                <Text
+                  className={`text-sm ${isDark ? "text-white" : "text-gray-700"}`}
+                >
+                  {Invite_Link}
+                </Text>
               </View>
               <TouchableOpacity
-                className="border border-gray-300 px-4 py-2 rounded-lg"
+                className={`border ${isDark ? "border-gray-500" : "border-gray-300"} px-4 py-2 rounded-lg`}
                 onPress={handleCopy}
               >
-                <Text className="text-sm font-medium">
+                <Text
+                  className={`text-sm font-medium ${isDark ? "text-white" : "text-black"}`}
+                >
                   {copied ? "Copied" : "Copy"}
                 </Text>
               </TouchableOpacity>
             </View>
             {copied && (
-              <Text className="text-xs text-green-600 mb-3">
+              <Text
+                className={`text-xs ${isDark ? "text-green-400" : "text-green-600"} mb-3`}
+              >
                 Link Copied to Clipboard
               </Text>
             )}
 
             {/* Divider */}
-            <View className="border-t border-gray-200 my-4" />
+            <View
+              className={`border-t ${isDark ? "border-gray-500" : "border-gray-200"} my-4`}
+            />
 
             {/* Email Invite */}
-            <Text className="text-sm font-semibold mb-2 text-gray-700">
+            <Text
+              className={`text-sm font-semibold mb-2 ${isDark ? "text-white" : "text-gray-700"}`}
+            >
               Or invite via email
             </Text>
             <TextInput
@@ -475,13 +651,25 @@ const Team = () => {
               placeholder="member@gmail.com"
               keyboardType="email-address"
               autoCapitalize="none"
-              className="border border-gray-300 rounded-lg px-4 py-3 text-sm mb-3"
+              className={`border ${isDark ? "border-gray-500" : "border-gray-300"} rounded-lg px-4 py-3 text-sm mb-3`}
+              placeholderTextColor={isDark ? "#9CA3AF" : "#000"}
             />
-            <Text className="text-sm font-semibold mb-2 text-gray-700">
+            <Text
+              className={`text-sm font-semibold mb-2 ${isDark ? "text-white" : "text-gray-700"}`}
+            >
               Role
             </Text>
-            <View className="border border-gray-300 rounded-lg mb-4">
-              <Picker selectedValue={inviteRole} onValueChange={setInviteRole}>
+            <View
+              className={`border ${isDark ? "border-gray-500" : "border-gray-300"} rounded-lg mb-4`}
+            >
+              <Picker
+                selectedValue={inviteRole}
+                onValueChange={setInviteRole}
+                dropdownIconColor={isDark ? "white" : "black"}
+                style={{
+                  color: isDark ? "white" : "black",
+                }}
+              >
                 {roleOptions.map((role) => (
                   <Picker.Item
                     key={role}

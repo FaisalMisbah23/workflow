@@ -52,12 +52,18 @@ const _layout = () => {
       screenOptions={{
         headerShown: false,
         tabBarActiveTintColor: isDark ? "#fff" : "#000",
-        tabBarInactiveTintColor: isDark ? "#64748b" : "#cdcde0",
+        tabBarInactiveTintColor: isDark ? "#9CA3AF" : "#cdcde0",
+        sceneStyle: {
+          backgroundColor: isDark ? "#111827" : "#FFFFFF",
+        },
         tabBarStyle: {
           height: 65,
           paddingTop: 5,
           borderRadius: 15,
-          backgroundColor: isDark ? "#1e293b" : "#fff",
+          backgroundColor: isDark ? "#1F2937" : "#FFFFFF",
+          shadowOffset: { width: 0, height: -2 },
+          shadowOpacity: 0.1,
+          shadowRadius: 4,
         },
         tabBarLabelStyle: {
           fontSize: 10,
