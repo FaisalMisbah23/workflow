@@ -1,20 +1,18 @@
 import "@/assets/styles/global.css";
 import NotificationProvider from "@/context/NotificationContext";
+import ThemeProvider, { ThemeContext } from "@/context/ThemeContext";
 import UserProvider, { UserContext } from "@/context/UserContext";
 import Ionicons from "@expo/vector-icons/build/Ionicons";
 import { Stack, useRouter } from "expo-router";
 import { useContext } from "react";
-import { useColorScheme, View } from "react-native";
-import { Bounce } from "react-native-animated-spinkit";
+import { View } from "react-native";
 import Toast from "react-native-toast-message";
 
 function RootLayoutContent() {
   const router = useRouter();
   const { user } = useContext(UserContext);
-  const isDarkMode = useColorScheme() === "dark";
-  if (!user) {
-    <Bounce size={40} color="blue" />;
-  }
+  const { isDark } = useContext(ThemeContext);
+
   return (
     <>
       <NotificationProvider userId={user?.user?.id}>
@@ -26,15 +24,15 @@ function RootLayoutContent() {
               title: "Create Account",
               headerTitleStyle: { fontWeight: 600 },
               headerStyle: {
-                backgroundColor: isDarkMode ? "#1F2937" : "#fff",
+                backgroundColor: isDark ? "#1F2937" : "#fff",
               },
-              headerTintColor: isDarkMode ? "#fff" : "#000",
+              headerTintColor: isDark ? "#fff" : "#000",
               headerLeft: () => (
                 <View>
                   <Ionicons
                     name="arrow-back"
                     size={26}
-                    color={isDarkMode ? "#fff" : "#000"}
+                    color={isDark ? "#fff" : "#000"}
                     onPress={() => router.back()}
                   />
                 </View>
@@ -47,16 +45,16 @@ function RootLayoutContent() {
               title: "Sign In",
               headerTitleStyle: { fontWeight: 600 },
               headerStyle: {
-                backgroundColor: isDarkMode ? "#1F2937" : "#fff",
+                backgroundColor: isDark ? "#1F2937" : "#fff",
               },
-              headerTintColor: isDarkMode ? "#fff" : "#000",
+              headerTintColor: isDark ? "#fff" : "#000",
               headerShadowVisible: false,
               headerLeft: () => (
                 <View>
                   <Ionicons
                     name="arrow-back"
                     size={26}
-                    color={isDarkMode ? "#fff" : "#000"}
+                    color={isDark ? "#fff" : "#000"}
                     onPress={() => router.back()}
                   />
                 </View>
@@ -66,19 +64,36 @@ function RootLayoutContent() {
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
           <Stack.Screen
             name="createtask"
-            options={{ title: "Create New Task" }}
+            options={{
+              title: "Create New Task",
+              headerStyle: { backgroundColor: isDark ? "#1F2937" : "#fff" },
+              headerTintColor: isDark ? "#fff" : "#000",
+            }}
           />
           <Stack.Screen
             name="createorganization"
-            options={{ title: "Create Your Organization" }}
+            options={{
+              title: "Create Your Organization",
+              headerStyle: { backgroundColor: isDark ? "#1F2937" : "#fff" },
+              headerTintColor: isDark ? "#fff" : "#000",
+            }}
           />
           <Stack.Screen
             name="info"
-            options={{ title: "Profile", headerTitleAlign: "center" }}
+            options={{
+              title: "Profile",
+              headerTitleAlign: "center",
+              headerStyle: { backgroundColor: isDark ? "#1F2937" : "#fff" },
+              headerTintColor: isDark ? "#fff" : "#000",
+            }}
           />
           <Stack.Screen
             name="notifications"
-            options={{ title: "Notifications" }}
+            options={{
+              title: "Notifications",
+              headerStyle: { backgroundColor: isDark ? "#1F2937" : "#fff" },
+              headerTintColor: isDark ? "#fff" : "#000",
+            }}
           />
           <Stack.Screen
             name="invite/[token]"
@@ -89,11 +104,14 @@ function RootLayoutContent() {
             options={{
               title: "Forgot Password",
               headerTitleStyle: { fontWeight: 600 },
+              headerStyle: { backgroundColor: isDark ? "#1F2937" : "#fff" },
+              headerTintColor: isDark ? "#fff" : "#000",
               headerLeft: () => (
                 <View>
                   <Ionicons
                     name="arrow-back"
                     size={26}
+                    color={isDark ? "#fff" : "#000"}
                     onPress={() => router.back()}
                   />
                 </View>
@@ -105,11 +123,14 @@ function RootLayoutContent() {
             options={{
               title: "Reset Password",
               headerTitleStyle: { fontWeight: 600 },
+              headerStyle: { backgroundColor: isDark ? "#1F2937" : "#fff" },
+              headerTintColor: isDark ? "#fff" : "#000",
               headerLeft: () => (
                 <View>
                   <Ionicons
                     name="arrow-back"
                     size={26}
+                    color={isDark ? "#fff" : "#000"}
                     onPress={() => router.back()}
                   />
                 </View>
@@ -126,7 +147,9 @@ function RootLayoutContent() {
 export default function RootLayout() {
   return (
     <UserProvider>
-      <RootLayoutContent />
+      <ThemeProvider>
+        <RootLayoutContent />
+      </ThemeProvider>
     </UserProvider>
   );
 }

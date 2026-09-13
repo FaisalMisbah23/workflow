@@ -1,4 +1,5 @@
 import DashboardData from "@/components/DashboardData";
+import { ThemeContext } from "@/context/ThemeContext";
 import { UserContext } from "@/context/UserContext";
 import Ionicons from "@expo/vector-icons/build/Ionicons";
 import { useRouter } from "expo-router";
@@ -9,6 +10,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 const Home = () => {
   const { user, profile } = useContext(UserContext) as any;
+  const { isDark } = useContext(ThemeContext);
 
   if (!user) {
     return (
@@ -54,14 +56,14 @@ const Home = () => {
   });
 
   return (
-    <SafeAreaView className="flex-1 bg-slate-50">
+    <SafeAreaView className={`flex-1 ${isDark ? "bg-slate-900" : "bg-slate-50"}`}>
       <ScrollView
         className="flex-1"
         contentContainerStyle={{ paddingBottom: 32 }}
         showsVerticalScrollIndicator={false}
       >
         <View className="px-5 pt-4">
-          <View className="mb-4 rounded-3xl bg-slate-900 p-5">
+          <View className={`mb-4 rounded-3xl p-5 ${isDark ? "bg-slate-800" : "bg-slate-900"}`}>
             <View className="mb-5 flex-row items-center justify-between">
               <View>
                 <Text className="text-xs uppercase tracking-widest text-slate-300">
@@ -91,18 +93,18 @@ const Home = () => {
 
         <DashboardData />
 
-        <View className="mx-5 mt-5 rounded-3xl border border-slate-200 bg-white p-4">
+        <View className={`mx-5 mt-5 rounded-3xl border p-4 ${isDark ? "border-slate-700 bg-slate-800" : "border-slate-200 bg-white"}`}>
           <View className="mb-3 flex-row items-center justify-between">
             <View>
-              <Text className="text-lg font-bold text-slate-900">
+              <Text className={`text-lg font-bold ${isDark ? "text-white" : "text-slate-900"}`}>
                 Quick Actions
               </Text>
-              <Text className="text-sm text-slate-500">
+              <Text className={`text-sm ${isDark ? "text-slate-400" : "text-slate-500"}`}>
                 Jump into your most-used flows
               </Text>
             </View>
-            <View className="h-10 w-10 items-center justify-center rounded-xl bg-slate-100">
-              <Ionicons name="flash-outline" size={18} color="#0F172A" />
+            <View className={`h-10 w-10 items-center justify-center rounded-xl ${isDark ? "bg-slate-700" : "bg-slate-100"}`}>
+              <Ionicons name="flash-outline" size={18} color={isDark ? "#fff" : "#0F172A"} />
             </View>
           </View>
 

@@ -1,4 +1,6 @@
+import KanbanBoard from "@/components/KanbanBoard";
 import NotificationBell from "@/components/NotificationBell";
+import { ThemeContext } from "@/context/ThemeContext";
 import { UserContext } from "@/context/UserContext";
 import { supabase } from "@/lib/supabase";
 import { showToast } from "@/utils/toast";
@@ -53,13 +55,14 @@ const Tasks = () => {
   const [editStatus, setEditStatus] = useState("pending");
   const [editDeadline, setEditDeadline] = useState("");
   const [editModalVisible, setEditModalVisible] = useState(false);
-  const [viewMode, setViewMode] = useState<"list" | "tree">("list");
+  const [viewMode, setViewMode] = useState<"list" | "tree" | "board">("list");
   const [expandedNodes, setExpandedNodes] = useState<Set<string>>(new Set());
 
   const buttons = ["All Tasks", "Pending", "In Progress", "Completed"];
   const router = useRouter();
   const { profile, isAdmin, isLead, user, teamMembers = [] } =
     useContext(UserContext);
+  const { isDark } = useContext(ThemeContext);
 
   if (!user) {
     return (
@@ -411,24 +414,44 @@ const Tasks = () => {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-white">
+    <SafeAreaView className={`flex-1 ${isDark ? "bg-slate-900" : "bg-white"}`}>
       <ScrollView className="p-5 flex-1">
         <View className="flex-row justify-between items-center mb-4">
-          <Text className="text-2xl font-semibold">Tasks</Text>
+          <Text className={`text-2xl font-semibold ${isDark ? "text-white" : "text-gray-900"}`}>Tasks</Text>
           <View className="flex-row items-center">
             <NotificationBell />
-            <TouchableOpacity
-              className="flex-row gap-2 bg-gray-100 px-3 py-2 rounded-lg ml-3 items-center"
-              onPress={() => setViewMode(viewMode === "list" ? "tree" : "list")}
-            >
-              <Ionicons
-                name={
-                  viewMode === "list" ? "list-outline" : "git-network-outline"
-                }
-                size={20}
-                color="#6B7280"
-              />
-            </TouchableOpacity>
+            <View className={`flex-row rounded-lg ml-3 ${isDark ? "bg-slate-700" : "bg-gray-100"}`}>
+              <TouchableOpacity
+                className={`px-3 py-2 ${viewMode === "list" ? "bg-primary" : ""}`}
+                onPress={() => setViewMode("list")}
+              >
+                <Ionicons
+                  name="list-outline"
+                  size={18}
+                  color={viewMode === "list" ? "#fff" : isDark ? "#94a3b8" : "#6B7280"}
+                />
+              </TouchableOpacity>
+              <TouchableOpacity
+                className={`px-3 py-2 ${viewMode === "tree" ? "bg-primary" : ""}`}
+                onPress={() => setViewMode("tree")}
+              >
+                <Ionicons
+                  name="git-network-outline"
+                  size={18}
+                  color={viewMode === "tree" ? "#fff" : isDark ? "#94a3b8" : "#6B7280"}
+                />
+              </TouchableOpacity>
+              <TouchableOpacity
+                className={`px-3 py-2 ${viewMode === "board" ? "bg-primary" : ""}`}
+                onPress={() => setViewMode("board")}
+              >
+                <Ionicons
+                  name="grid-outline"
+                  size={18}
+                  color={viewMode === "board" ? "#fff" : isDark ? "#94a3b8" : "#6B7280"}
+                />
+              </TouchableOpacity>
+            </View>
             <TouchableOpacity
               className="flex-row gap-2 bg-primary px-4 py-2 rounded-lg ml-2 items-center"
               onPress={() => router.push("/createtask")}
@@ -439,10 +462,10 @@ const Tasks = () => {
           </View>
         </View>
 
-        <View className="flex-row items-center border border-gray-200 bg-gray-100 px-3 rounded-lg mb-4">
-          <Ionicons name="search" size={20} color="#6B7280" />
+        <View className={`flex-row items-center border px-3 rounded-lg mb-4 ${isDark ? "border-slate-600 bg-slate-800" : "border-gray-200 bg-gray-100"}`}>
+          <Ionicons name="search" size={20} color={isDark ? "#94a3b8" : "#6B7280"} />
           <TextInput
-            className="flex-1 ml-2 text-base bg-transparent border-0 outline-none"
+            className={`flex-1 ml-2 text-base bg-transparent border-0 outline-none ${isDark ? "text-white" : "text-gray-900"}`}
             placeholder="Search tasks..."
             placeholderTextColor="#9CA3AF"
             value={searchQuery}
@@ -472,7 +495,7 @@ const Tasks = () => {
                 className={`rounded-lg px-4 py-2 mr-3 ${
                   isActive
                     ? "bg-primary"
-                    : "bg-transparent border border-primary"
+                    : isDark ? "bg-transparent border border-primary" : "bg-transparent border border-primary"
                 }`}
               >
                 <Text
@@ -485,14 +508,20 @@ const Tasks = () => {
           })}
         </ScrollView>
 
-        <View
-          className="mt-4"
-          // refreshControl={
-          //   <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-          // }
-        >
-          {treeTasks.length === 0 ? (
-            <View className=" items-center justify-center">
+        <View className="mt-4">
+          {viewMode === "board" ? (
+            <KanbanBoard
+              tasks={filteredTasks}
+              onStatusChange={(taskId, newStatus) => {
+                setTasks((prev) =>
+                  prev.map((t) =>
+                    t.id === taskId ? { ...t, status: newStatus } : t
+                  )
+                );
+              }}
+            />
+          ) : treeTasks.length === 0 ? (
+            <View className="items-center justify-center">
               <Ionicons name="clipboard-outline" size={60} color="#ccc" />
               <Text className="text-gray-400 mt-4 text-lg">No tasks found</Text>
             </View>
@@ -502,15 +531,15 @@ const Tasks = () => {
             filteredTasks.map((task) => (
               <View
                 key={task.id}
-                className="bg-gray-50 p-4 rounded-xl mb-3 border border-gray-200"
+                className={`p-4 rounded-xl mb-3 border ${isDark ? "bg-slate-800 border-slate-700" : "bg-gray-50 border-gray-200"}`}
               >
                 <View className="flex-row justify-between items-start">
                   <View className="flex-1">
-                    <Text className="text-base font-semibold">
+                    <Text className={`text-base font-semibold ${isDark ? "text-white" : "text-gray-900"}`}>
                       {task.title}
                     </Text>
                     {task.description && (
-                      <Text className="text-gray-600 mt-1 text-sm">
+                      <Text className={`mt-1 text-sm ${isDark ? "text-slate-400" : "text-gray-600"}`}>
                         {task.description}
                       </Text>
                     )}
@@ -519,7 +548,7 @@ const Tasks = () => {
                       {renderStatusBadge(task.status)}
                     </View>
                     {getAssigneeLabel(task) && (
-                      <Text className="text-gray-500 text-xs mt-1">
+                      <Text className={`text-xs mt-1 ${isDark ? "text-slate-500" : "text-gray-500"}`}>
                         Assigned to: {getAssigneeLabel(task)}
                       </Text>
                     )}
@@ -537,7 +566,7 @@ const Tasks = () => {
                       <Ionicons
                         name="create-outline"
                         size={20}
-                        color="#6B7280"
+                        color={isDark ? "#94a3b8" : "#6B7280"}
                       />
                     </TouchableOpacity>
                     <TouchableOpacity
@@ -566,43 +595,46 @@ const Tasks = () => {
         onRequestClose={() => setEditModalVisible(false)}
       >
         <View className="flex-1 bg-black/50 justify-end">
-          <View className="bg-white rounded-t-3xl p-5">
+          <View className={`rounded-t-3xl p-5 ${isDark ? "bg-slate-800" : "bg-white"}`}>
             <View className="flex-row justify-between items-center mb-4">
-              <Text className="text-lg font-bold">Edit Task</Text>
+              <Text className={`text-lg font-bold ${isDark ? "text-white" : "text-gray-900"}`}>Edit Task</Text>
               <TouchableOpacity onPress={() => setEditModalVisible(false)}>
-                <Ionicons name="close" size={24} color="#6B7280" />
+                <Ionicons name="close" size={24} color={isDark ? "#94a3b8" : "#6B7280"} />
               </TouchableOpacity>
             </View>
 
-            <Text className="text-sm font-semibold text-gray-700 mb-1">
+            <Text className={`text-sm font-semibold mb-1 ${isDark ? "text-slate-300" : "text-gray-700"}`}>
               Title
             </Text>
             <TextInput
-              className="border border-gray-300 rounded-lg p-3 mb-3 text-base"
+              className={`border rounded-lg p-3 mb-3 text-base ${isDark ? "border-slate-600 text-white" : "border-gray-300 text-gray-900"}`}
               value={editTitle}
               onChangeText={setEditTitle}
               placeholder="Task title"
+              placeholderTextColor={isDark ? "#94a3b8" : "#9CA3AF"}
             />
 
-            <Text className="text-sm font-semibold text-gray-700 mb-1">
+            <Text className={`text-sm font-semibold mb-1 ${isDark ? "text-slate-300" : "text-gray-700"}`}>
               Description
             </Text>
             <TextInput
-              className="border border-gray-300 rounded-lg p-3 mb-3 text-base"
+              className={`border rounded-lg p-3 mb-3 text-base ${isDark ? "border-slate-600 text-white" : "border-gray-300 text-gray-900"}`}
               value={editDescription}
               onChangeText={setEditDescription}
               placeholder="Task description"
+              placeholderTextColor={isDark ? "#94a3b8" : "#9CA3AF"}
               multiline
               numberOfLines={3}
             />
 
-            <Text className="text-sm font-semibold text-gray-700 mb-1">
+            <Text className={`text-sm font-semibold mb-1 ${isDark ? "text-slate-300" : "text-gray-700"}`}>
               Priority
             </Text>
-            <View className="border border-gray-300 rounded-lg mb-3">
+            <View className={`border rounded-lg mb-3 ${isDark ? "border-slate-600" : "border-gray-300"}`}>
               <Picker
                 selectedValue={editPriority}
                 onValueChange={(itemValue) => setEditPriority(itemValue)}
+                style={{ color: isDark ? "#fff" : "#000" }}
               >
                 <Picker.Item label="Low" value="Low" />
                 <Picker.Item label="Medium" value="Medium" />
@@ -610,13 +642,14 @@ const Tasks = () => {
               </Picker>
             </View>
 
-            <Text className="text-sm font-semibold text-gray-700 mb-1">
+            <Text className={`text-sm font-semibold mb-1 ${isDark ? "text-slate-300" : "text-gray-700"}`}>
               Status
             </Text>
-            <View className="border border-gray-300 rounded-lg mb-3">
+            <View className={`border rounded-lg mb-3 ${isDark ? "border-slate-600" : "border-gray-300"}`}>
               <Picker
                 selectedValue={editStatus}
                 onValueChange={(itemValue) => setEditStatus(itemValue)}
+                style={{ color: isDark ? "#fff" : "#000" }}
               >
                 <Picker.Item label="Pending" value="pending" />
                 <Picker.Item label="In Progress" value="in_progress" />
@@ -624,14 +657,15 @@ const Tasks = () => {
               </Picker>
             </View>
 
-            <Text className="text-sm font-semibold text-gray-700 mb-1">
+            <Text className={`text-sm font-semibold mb-1 ${isDark ? "text-slate-300" : "text-gray-700"}`}>
               Deadline
             </Text>
             <TextInput
-              className="border border-gray-300 rounded-lg p-3 mb-4 text-base"
+              className={`border rounded-lg p-3 mb-4 text-base ${isDark ? "border-slate-600 text-white" : "border-gray-300 text-gray-900"}`}
               value={editDeadline}
               onChangeText={setEditDeadline}
               placeholder="YYYY-MM-DD"
+              placeholderTextColor={isDark ? "#94a3b8" : "#9CA3AF"}
             />
 
             <TouchableOpacity
