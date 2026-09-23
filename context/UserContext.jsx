@@ -114,9 +114,14 @@ const UserProvider = ({ children }) => {
     return () => listener.subscription.unsubscribe();
   }, [router]);
   const fetchTeamMembers = async (profileData = profile) => {
-    if (!profileData || !user) return;
+    console.log("FETCH TEAM - profileData:", profileData?.role, "org_id:", profileData?.org_id, "user:", user?.user?.id);
+    if (!profileData || !user) {
+      console.log("FETCH TEAM - early return: no profile or user");
+      return;
+    }
     // Only fetch team members if user is a lead or admin
     if (!profileData?.role || profileData.role === "member") {
+      console.log("FETCH TEAM - early return: member role");
       setTeamMembers([]);
       return;
     }
@@ -132,6 +137,8 @@ const UserProvider = ({ children }) => {
     }
 
     const { data, error } = await query;
+
+    console.log("FETCH TEAM - result:", data?.length, "error:", error?.message);
 
     if (error) {
       console.log("TEAM MEMBERS ERROR:", error.message);
@@ -199,14 +206,17 @@ const UserProvider = ({ children }) => {
     };
 
     const loadAllData = async () => {
+      console.log("LOAD ALL DATA - starting");
       await fetchProfile();
       await fetchOrganizations();
+      console.log("LOAD ALL DATA - profile fetched, fetching team members");
       // Fetch team members after profile is loaded
       const { data: profileData } = await supabase
         .from("profiles")
         .select("id, fullname, email, role, lead_id, org_id")
         .eq("id", user.user.id)
         .single();
+      console.log("LOAD ALL DATA - profileData for team:", profileData?.role, profileData?.org_id);
       if (profileData) {
         await fetchTeamMembers(profileData);
       }

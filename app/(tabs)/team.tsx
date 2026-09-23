@@ -29,6 +29,9 @@ const Team = () => {
     isLead,
     fetchTeamMembers,
   } = useContext(UserContext) as any;
+
+  // DEBUG: Log team data
+  console.log("TEAM DEBUG - teamMembers:", teamMembers?.length, "profile:", profile?.role, "orgId:", Org?.[0]?.id);
   const [modalVisible, setModalVisible] = useState(false);
   const [copied, setCopied] = useState(false);
   const [email, setEmail] = useState("");
