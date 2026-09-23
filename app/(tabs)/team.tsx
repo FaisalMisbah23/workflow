@@ -389,7 +389,7 @@ const Team = () => {
               {/* MAIN VERTICAL LINE */}
               <View className="absolute left-3 top-0 bottom-0 w-[2px] bg-gray-300" />
 
-              {/* ADMINS */}
+              {/* ADMINS at top level */}
               {admins.map((admin) => (
                 <View key={admin.id} className="mb-6">
                   <View className="flex-row items-center">
@@ -408,7 +408,7 @@ const Team = () => {
                 </View>
               ))}
 
-              {/* LEADS (top level if no admins, otherwise under first admin) */}
+              {/* LEADS at top level (when no admins) */}
               {admins.length === 0 && leads.map((lead) => (
                 <View key={lead.id} className="mb-4">
                   <View className="flex-row items-center">
@@ -427,7 +427,7 @@ const Team = () => {
                 </View>
               ))}
 
-              {/* MEMBERS (top level if no admins AND no leads) */}
+              {/* LEADS and MEMBERS at top level (when no admins) */}
               {admins.length === 0 && leads.length === 0 && members.map((member) => (
                 <View key={member.id} className="mb-3">
                   <View className="flex-row items-center">
@@ -446,9 +446,9 @@ const Team = () => {
                 </View>
               ))}
 
-              {/* MEMBERS under leads (when leads exist) */}
-              {admins.length === 0 && leads.length > 0 && leads.map((lead) => (
-                <View key={`members-${lead.id}`} className="ml-6 relative pl-6 mt-2">
+              {/* MEMBERS under leads (when no admins but leads exist) */}
+              {admins.length === 0 && leads.length > 0 && (
+                <View className="ml-6 relative pl-6 mt-2">
                   {members.map((member) => (
                     <View key={member.id} className="flex-row items-center mb-2">
                       <View className="absolute left-[-24px] top-[-20px] bottom-[80px] w-[2px] bg-gray-300" />
@@ -465,7 +465,48 @@ const Team = () => {
                     </View>
                   ))}
                 </View>
-              ))}
+              )}
+
+              {/* LEADS and MEMBERS under admins (when admins exist) */}
+              {admins.length > 0 && (
+                <View className="ml-6 relative pl-6 mt-3">
+                  {/* LEADS */}
+                  {leads.map((lead) => (
+                    <View key={lead.id} className="mb-4">
+                      <View className="flex-row items-center">
+                        <View className="absolute left-[-24px] top-[-22px] bottom-[75px] w-[2px] bg-gray-300" />
+                        <View className="w-28 h-[2px] bg-gray-300 absolute left-[-52px]" />
+                        <View className="w-2.5 h-2.5 bg-purple-500 rounded-full absolute left-[-6px]" />
+                        <TeamCard
+                          item={lead}
+                          isAdmin={isAdmin}
+                          profile={profile}
+                          onChangeRole={handleChangeRole}
+                          onRemoveMember={handleRemoveMember}
+                          roleOverrides={roleOverrides}
+                        />
+                      </View>
+                    </View>
+                  ))}
+
+                  {/* MEMBERS (flat list under admins) */}
+                  {members.map((member) => (
+                    <View key={member.id} className="flex-row items-center mb-2">
+                      <View className="absolute left-[-24px] top-[-20px] bottom-[80px] w-[2px] bg-gray-300" />
+                      <View className="w-36 h-[2px] bg-gray-300 absolute left-[-95px]" />
+                      <View className="w-2 h-2 bg-green-500 rounded-full absolute left-[-6px]" />
+                      <TeamCard
+                        item={member}
+                        isAdmin={isAdmin}
+                        profile={profile}
+                        onChangeRole={handleChangeRole}
+                        onRemoveMember={handleRemoveMember}
+                        roleOverrides={roleOverrides}
+                      />
+                    </View>
+                  ))}
+                </View>
+              )}
             </View>
           ) : null}
 
